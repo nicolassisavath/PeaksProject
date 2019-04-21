@@ -47,4 +47,13 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
     */
+   
+   public function findByLogin(string $login): ?User
+   {
+    return $this->createQueryBuilder('u')
+        ->andWhere('u.login = :log')
+        ->setParameter('log', $login)
+        ->getQuery()
+        ->getOneOrNullResult();
+   }
 }

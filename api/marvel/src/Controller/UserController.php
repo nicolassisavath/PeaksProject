@@ -1,0 +1,208 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\User;
+use App\Form\UserType;
+use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+/**
+ * @Route("/user")
+ */
+class UserController extends AbstractController
+{
+
+    /**
+     * API : SignUp
+     * @Route("/balance", methods={"POST"})
+     */
+    public function balance(Request $request): Response
+    {
+        $post = json_decode(
+            $request->getContent(),
+            true
+        ); 
+
+        //$get = $request->query;
+        $user = new User();
+
+        if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
+        {
+            $user->setLogin($login);
+            $user->setPassword(password_hash($pwd, PASSWORD_DEFAULT));
+            $user->setFavoritesNumber(0);
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return new JsonResponse(["code_statuette" => "Oui client crée"]);
+        }
+        else
+            return new JsonResponse(["code_statuette" => "nom pas bien"]);
+    }
+
+    /**
+     * API : Login
+     * @Route("/compare", methods={"POST"})
+     */
+    public function compare(Request $request, UserRepository $userRepository): Response
+    {
+        $post = json_decode(
+            $request->getContent(),
+            true
+        );    
+
+        if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
+        {
+            $dbUser = $userRepository->findByLogin($login);
+            if($dbUser !== null)
+            {
+                if (password_verify($pwd, $dbUser->getPassword()))
+                    return new JsonResponse(["statut" => "connecté"]);
+            }
+            return new JsonResponse(["statut" => "bad credentials"]);
+        }
+        else
+        {
+            return new JsonResponse(["statut" => "données manquantes"]);
+        }
+    }
+
+
+
+    //***************************************************
+    /**
+     * @Route("/", name="user_index", methods={"GET"})
+     */
+    public function index(UserRepository $userRepository): Response
+    {
+        return $this->render('user/index.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
+
+    // /**
+    //  * @Route("/new", name="user_new", methods={"GET","POST"})
+    //  */
+    // public function new(Request $request): Response
+    // {
+    //     $user = new User();
+    //     $data = json_decode(
+    //         $request->getContent(),
+    //         true
+    //     );
+
+    //     var_dump($request->query);
+    //     var_dump($request->request);//do ot work with json data
+
+    //     $info = $request->getContent();
+
+    //     var_dump($info);
+    //     var_dump($data);
+    //     var_dump($data["login"]);
+
+    //     var_dump($request);
+
+    //     // $user->setLogin($request->request->get('login'));
+    //     // // $clearPwd = $request->get('password');
+    //     // // $user->setPassword(password_hash($clearPwd, PASSWORD_DEFAULT));
+    //     // // $user->setFavoritesNumber(0);
+    //     // $form = $this->createForm(UserType::class, $user);
+    //     // $form->handleRequest($request);
+
+    //     // // if ($form->isSubmitted() && $form->isValid()) {
+    //     // //     $entityManager = $this->getDoctrine()->getManager();
+    //     //     $entityManager->persist($user);
+    //     //     $entityManager->flush();
+
+    //     // //     return $this->redirectToRoute('user_index');
+    //     // // }
+
+    //     // return $this->render('user/new.html.twig', [
+    //     //     'user' => $user,
+    //     //     'request' => $request,
+    //     //     'form' => $form->createView(),
+    //     // ]);
+    //     return new Response([["ok" => "yep"]]);
+        
+    // }
+
+    // /**
+    //  * @Route("/{id}", name="user_show", methods={"GET"})
+    //  */
+    // public function show(User $user): Response
+    // {
+    //     return $this->render('user/show.html.twig', [
+    //         'user' => $user,
+    //     ]);
+    // }
+
+    // /**
+    //  * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
+    //  */
+    // public function edit(Request $request, User $user): Response
+    // {
+    //     $form = $this->createForm(UserType::class, $user);
+    //     $form->handleRequest($request);
+
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $this->getDoctrine()->getManager()->flush();
+
+    //         return $this->redirectToRoute('user_index', [
+    //             'id' => $user->getId(),
+    //         ]);
+    //     }
+
+    //     return $this->render('user/edit.html.twig', [
+    //         'user' => $user,
+    //         'form' => $form->createView(),
+    //     ]);
+    // }
+
+    // /**
+    //  * @Route("/{id}", name="user_delete", methods={"DELETE"})
+    //  */
+    // public function delete(Request $request, User $user): Response
+    // {
+    //     if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+    //         $entityManager = $this->getDoctrine()->getManager();
+    //         $entityManager->remove($user);
+    //         $entityManager->flush();
+    //     }
+
+    //     return $this->redirectToRoute('user_index');
+    // }
+
+    /***************
+
+    //     /**
+    //  * @Route("/new", name="create_user", methods={"POST"})
+    //  */
+    // public function CreateNew(Request $request): Response
+    // {
+    //     $user = new User();
+    //     $form = $this->createForm(UserType::class, $user);
+    //     $form->handleRequest($request);
+
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $entityManager = $this->getDoctrine()->getManager();
+    //         $entityManager->persist($user);
+    //         $entityManager->flush();
+
+    //         return $this->redirectToRoute('user_index');
+    //     }
+
+    //     return $this->render('user/new.html.twig', [
+    //         'user' => $user,
+    //         'form' => $form->createView(),
+    //     ]);
+    // }
+}
