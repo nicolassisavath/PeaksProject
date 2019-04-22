@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @Route("api/marvel")
+ */
 class MarvelController extends AbstractController
 {
 	/**
@@ -37,7 +40,6 @@ class MarvelController extends AbstractController
 		  CURLOPT_POSTFIELDS => "",
 		  CURLOPT_HTTPHEADER => array(
 		    "Content-Type: application/json",
-		    // "Postman-Token: 2b52b08b-3b33-4d62-bace-92e9e218d428",
 		    "cache-control: no-cache"
 		  ),
 		));

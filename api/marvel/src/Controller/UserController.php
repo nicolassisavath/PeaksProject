@@ -13,16 +13,16 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * @Route("/user")
+ * @Route("api/user")
  */
 class UserController extends AbstractController
 {
 
     /**
      * API : SignUp
-     * @Route("/balance", methods={"POST"})
+     * @Route("/create", methods={"POST"})
      */
-    public function balance(Request $request, UserRepository $userRepository): Response
+    public function create(Request $request, UserRepository $userRepository): Response
     {
         $post = json_decode(
             $request->getContent(),
@@ -52,9 +52,9 @@ class UserController extends AbstractController
 
     /**
      * API : Login
-     * @Route("/compare", methods={"POST"})
+     * @Route("/login", methods={"POST"})
      */
-    public function compare(Request $request, UserRepository $userRepository): Response
+    public function login(Request $request, UserRepository $userRepository): Response
     {
         $post = json_decode(
             $request->getContent(),
