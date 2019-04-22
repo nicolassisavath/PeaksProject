@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Hero;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\HeroRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,16 +22,22 @@ class UserController extends AbstractController
     /**
      * @var UserRepository
      */
-    private $repository;
+    private $userRepository;
+
+    /**
+     * @var UserRepository
+     */
+    private $heroRepository;
 
     /**
      * @var EntityManager
      */
     private $em;
 
-    public function __construct(UserRepository $repository)
+    public function __construct(UserRepository $repository, HeroRepository $heroRepository)
     {
-        $this->repository = $repository;
+        $this->userRepository = $repository;
+        $this->heroRepository = $heroRepository;
     }
 
     /**
@@ -45,7 +53,7 @@ class UserController extends AbstractController
 
         if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
         {
-            if ( ($dbUser = $this->repository->findOneBy(["login" => $login])) !== null )
+            if ( ($dbUser = $this->userRepository->findOneBy(["login" => $login])) !== null )
                 return new JsonResponse(["status" => "This login already exists."], 400);
             else
                 $user = new User();
@@ -68,7 +76,7 @@ class UserController extends AbstractController
      * API : Login
      * @Route("/login", methods={"POST"})
      */
-    public function login(Request $request, UserRepository $userRepository): Response
+    public function login(Request $request): Response
     {
         $post = json_decode(
             $request->getContent(),
@@ -79,14 +87,98 @@ class UserController extends AbstractController
             return new JsonResponse(["status" => "Some data are missing."], 400);
         else
         {
-            $dbUser = $this->repository->findOneBy(["login" => $login]);
+            $dbUser = $this->userRepository->findOneBy(["login" => $login]);
 
             if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
-                return new JsonResponse(["status" => "Connected.", "userId" => $dbUser->getId()]);
+            {
+                if (count($dbUser->getHeroes()) > 0)
+                {
+                    foreach ($dbUser->getHeroes() as $favorite) {
+                        $fav[] = $favorite->getMarvelId();
+                    }
+                }
+                return new JsonResponse( ["status" => "Connected.", "userId" => $dbUser->getId(), "favourites" => $fav] );
+            }
             else
                 return new JsonResponse(["status" => "Bad credentials."], 400);
         }
     }
+
+    /**
+     * API : Add a hero to user favourites
+     * @Route("/addToFavourites", methods={"POST"})
+     */
+    public function addToFavourites(Request $request): Response
+    {
+        $post = json_decode(
+            $request->getContent(),
+            true
+        );  
+
+        if ( ($userId = $post['userId']) === null || ($heroId = $post['heroId']) === null )
+                return new JsonResponse(["response" => "Bad request."], 400);
+        else
+        {
+            $user = $this->userRepository->findOneBy(["id" => $userId]);
+            if (is_null($user))
+                return new JsonResponse(["response" => "User not found."], 400);
+
+            if(count($user->getHeroes()) === 5)
+                return new JsonResponse(["response" => "Allready 5 favourites."], 400);
+
+            $dbHero = $this->heroRepository->findOneBy(["marvelId" => $heroId]);
+            if ( $dbHero === null )
+            {
+                $dbHero = new Hero($heroId);
+
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($dbHero);
+                $em->flush();
+            }
+
+            $user->addHero($dbHero);
+            $user->incrementFavoritesNumber();
+            $em->persist($user);
+            $em->flush();
+
+            return new JsonResponse(["response" => "Favourite added"]);
+        }            
+    }
+
+    /**
+     * API : Remove a hero to user favourites
+     * @Route("/removeFromFavourites", methods={"POST"})
+     */
+    public function removeFromFavourites(Request $request): Response
+    {
+        $post = json_decode(
+            $request->getContent(),
+            true
+        );  
+
+        if ( ($userId = $post['userId']) === null || ($heroId = $post['heroId']) === null )
+                return new JsonResponse(["response" => "Bad request."], 400);
+        else
+        {
+            $user = $this->userRepository->findOneBy(["id" => $userId]);
+            if (is_null($user))
+                return new JsonResponse(["response" => "User not found."], 400);
+
+            $dbHero = $this->heroRepository->findOneBy(["marvelId" => $heroId]);
+            if ( is_null($dbHero) )
+                return new JsonResponse(["response" => "Hero not found."], 400);
+            else
+            {
+                $user->removeHero($dbHero);
+                $user->decrementFavoritesNumber();
+                $em->persist($user);
+                $em->flush();
+            }
+
+            return new JsonResponse(["response" => "Favourite added"]);
+        }            
+    }
+
 
 //     /**
 //      * API : Login

@@ -156,9 +156,15 @@ class MarvelController extends AbstractController
 			if ($err) {
 			  	echo "cURL Error #:" . $err;
 			} else {
-			  	//echo $response;
-			  	//SELECT ONLY IMPORTANT FIELDS FOR JS RETURN
-		  		return new Response($response);
+			  	$lightHero = new LightHero();
+				$lightHero->setId($hero->id)
+				      	  ->setName($hero->name)
+				      	  ->setDescription($hero->description)
+				      	  ->setPath($hero->thumbnail->path)
+				      	  ->setExtension($hero->thumbnail->extension);
+
+				$lightHero = $lightHero->get_object_as_array();
+		  		return new Response(json_encode($lightHero));
 			}
 		}
 		else

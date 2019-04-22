@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,6 +32,26 @@ class User
      * @ORM\Column(type="integer", nullable=true)
      */
     private $favoritesNumber;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Hero")
+     */
+    private $heroes;
+
+    public function __construct()
+    {
+        $this->heroes = new ArrayCollection();
+    }
+
+    public function incrementFavoritesNumber()
+    {
+        $this->favoritesNumber++;
+    }
+
+    public function decrementFavoritesNumber()
+    {
+        $this->favoritesNumber--;
+    }
 
     public function getId(): ?int
     {
@@ -68,6 +90,32 @@ class User
     public function setFavoritesNumber(?int $favoritesNumber): self
     {
         $this->favoritesNumber = $favoritesNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Hero[]
+     */
+    public function getHeroes(): Collection
+    {
+        return $this->heroes;
+    }
+
+    public function addHero(Hero $hero): self
+    {
+        if (!$this->heroes->contains($hero)) {
+            $this->heroes[] = $hero;
+        }
+
+        return $this;
+    }
+
+    public function removeHero(Hero $hero): self
+    {
+        if ($this->heroes->contains($hero)) {
+            $this->heroes->removeElement($hero);
+        }
 
         return $this;
     }

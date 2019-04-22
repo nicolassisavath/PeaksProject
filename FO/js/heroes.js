@@ -34,8 +34,10 @@ function createHeroCard(hero)
 	cardDescription.classList.add('cardDescription');
 
 	card.classList.add('card');
+
+	return card;
 	
-	heroesDisplayer.appendChild(card);
+	// heroesDisplayer.appendChild(card);
 }
 
 function getModalDetails(element, id) {
@@ -121,7 +123,9 @@ function displayHeroesCbk(xhr){
 		//Dislay Heroes Cards
 		var heroes = response['heroes'];
 		heroesDisplayer.innerHTML = '';
-		heroes.forEach(hero => createHeroCard(hero));
+	
+		heroes.forEach(hero => {var card = createHeroCard(hero);  
+			heroesDisplayer.appendChild(card);});
 	}
 }
 
@@ -143,15 +147,13 @@ function displayModalCbk(xhr){
 			item.innerHTML = comic['title'];
 		})
 
-		//Add Favourite button if user is connected
-		if (isAuthent()){
-			var addFavBtn = document.createElement('button');
-			addFavBtn.innerHTML = "Add to Favourites";
+		//Displpay or hide Add Favourite button
+		var addFavBtn = modal.querySelector("#favoriteBtn");
+		display(addFavBtn, isAuthent());
 
+		if (isAuthent()){
 			var heroId = modal.getAttribute("data-id");
 			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
-			addFavBtn.classList.add('btn');
-			modal.querySelector('.dataModal').append(addFavBtn);
 		}
 		display(modal);
 	}
@@ -166,6 +168,15 @@ function addToFavourites(heroId){
 			userId : localStorage.getItem("userId"),
 			heroId : heroId
 		}
-		// request("POST", baseUrl + prefixUser +'addToFavourites', addToFavouritesCbk, data);
+		request("POST", baseUrl + prefixUser +'addToFavourites', addToFavouritesCbk, data);
 	}
+}
+
+function addToFavouritesCbk(xhr) {
+	var response = JSON.parse(xhr.responseText);
+
+	if (xhr.status == 200)
+		notify("The hero has been added to favourites");
+	else
+		notify(response["response"]);
 }
