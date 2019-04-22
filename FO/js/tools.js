@@ -3,7 +3,7 @@ Functions and variables utilized in other script files
  */
 
 
-var baseUrl = "http://localhost:8000/";
+var baseUrl = "http://localhost:8000/api/";
 	
 function request(method, url, callback = null, data = null) {
 	var xhr = new XMLHttpRequest();
@@ -31,7 +31,7 @@ function display(element, display = true){
 
 //Display the connected status
 function isAuthent() {
-	return localStorage.getItem("connected");
+	return localStorage.getItem("userId");
 }
 
 //Notify the user in the sidebar

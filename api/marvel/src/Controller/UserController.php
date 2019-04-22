@@ -17,12 +17,26 @@ use Symfony\Component\HttpFoundation\JsonResponse;
  */
 class UserController extends AbstractController
 {
+    /**
+     * @var UserRepository
+     */
+    private $repository;
+
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    public function __construct(UserRepository $repository)
+    {
+        $this->repository = $repository;
+    }
 
     /**
      * API : SignUp
      * @Route("/create", methods={"POST"})
      */
-    public function create(Request $request, UserRepository $userRepository): Response
+    public function create(Request $request): Response
     {
         $post = json_decode(
             $request->getContent(),
@@ -31,17 +45,17 @@ class UserController extends AbstractController
 
         if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
         {
-            if ( ($dbUser = $userRepository->findByLogin($login)) !== null )
+            if ( ($dbUser = $this->repository->findOneBy(["login" => $login])) !== null )
                 return new JsonResponse(["status" => "This login already exists."], 400);
             else
                 $user = new User();
-                $user->setLogin($login);
-                $user->setPassword(password_hash($pwd, PASSWORD_DEFAULT));
-                $user->setFavoritesNumber(0);
+                $user->setLogin($login)
+                     ->setPassword(password_hash($pwd, PASSWORD_DEFAULT))
+                     ->setFavoritesNumber(0);
 
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($user);
-                $entityManager->flush();
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($user);
+                $em->flush();
 
                 return new JsonResponse(["status" => "The account was ceated successfully"]);
             //retourné le client aussi
@@ -65,7 +79,7 @@ class UserController extends AbstractController
             return new JsonResponse(["status" => "Some data are missing."], 400);
         else
         {
-            $dbUser = $userRepository->findByLogin($login);
+            $dbUser = $this->repository->findOneBy(["login" => $login]);
 
             if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
                 return new JsonResponse(["status" => "Connected.", "userId" => $dbUser->getId()]);

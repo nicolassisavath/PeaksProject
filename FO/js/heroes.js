@@ -1,3 +1,4 @@
+var prefixHeroes = "marvel/";
 var heroesDisplayer = document.querySelector("#heroesContainer");
 var modal = document.querySelector("#heroDetailsModal");
 var cardPictureFormat = "portrait_xlarge";
@@ -7,7 +8,7 @@ var initialOffset = 100;
 
 //******************* TOOLS
 function displayHeroes(offset = initialOffset, limit = sizePage){
-	var url = baseUrl + 'getCharactersList?limit=' + limit + "&offset=" + offset;
+	var url = baseUrl + prefixHeroes + 'getCharactersList?limit=' + limit + "&offset=" + offset;
 	request("GET", url, displayHeroesCbk);
 }
 
@@ -38,13 +39,15 @@ function createHeroCard(hero)
 }
 
 function getModalDetails(element, id) {
-	transfertDetailsToModal(element);// transfer hero data from the card to the modal
+	transfertDetailsToModal(element, id);// transfer hero data from the card to the modal
 
-	url = baseUrl + 'getThreeFirstComicsByCharacterId?id=' + id;
-	request("GET", url, displayModalCbk); // request additional data about comics and display in the modal
+	url = baseUrl + prefixHeroes + 'getThreeFirstComicsByCharacterId?id=' + id;
+	// request additional data about comics and display in the modal
+	request("GET", url, displayModalCbk); 
 }
 
-function transfertDetailsToModal(element){
+function transfertDetailsToModal(element, id){
+	modal.setAttribute("data-id", id);
 	var card = element.parentElement;
 
 	//On recupère les données déjà présentes dans le DOM 
@@ -62,7 +65,7 @@ function paginate(offset, limit, total){
 
 	paginationContainer.innerHTML = '';
 
-	var max = Math.floor(total/limit); // get the maximim number of pages
+	var max = Math.ceil(total/limit); // get the maximim number of pages
 	if (max > 1){
 		var pagination = document.createElement('select');
 		pagination.setAttribute("onclick", "displayHeroes(this.value)");
@@ -76,7 +79,8 @@ function paginate(offset, limit, total){
 		}
 		paginationContainer.append(pagination);
 
-		if (offset != 0){
+		//Before Button
+		if (offset != 0){ //don't show befoore nutton on first page
 			var before = document.createElement('a');
 			before.innerHTML = "&laquo";
 			beforeOffset = offset - limit;
@@ -85,7 +89,8 @@ function paginate(offset, limit, total){
 			paginationContainer.prepend(before);
 		}
 
-		if (offset != max){
+		//After Button
+		if ( (offset/limit)+1 != max ){ //don't show after button if on last page
 			var after = document.createElement('a');
 			after.innerHTML = "&raquo;";
 			afterOffset = offset + limit;
@@ -93,7 +98,6 @@ function paginate(offset, limit, total){
 			after.classList.add('paginationBtn');
 			paginationContainer.append(after);
 		}
-
 	}
 }
 //******************* EVENTS
@@ -138,6 +142,30 @@ function displayModalCbk(xhr){
 			list.appendChild(item);
 			item.innerHTML = comic['title'];
 		})
+
+		//Add Favourite button if user is connected
+		if (isAuthent()){
+			var addFavBtn = document.createElement('button');
+			addFavBtn.innerHTML = "Add to Favourites";
+
+			var heroId = modal.getAttribute("data-id");
+			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
+			addFavBtn.classList.add('btn');
+			modal.querySelector('.dataModal').append(addFavBtn);
+		}
 		display(modal);
+	}
+}
+
+
+function addToFavourites(heroId){
+	if (!isAuthent())
+		return
+	else{
+		var data = {
+			userId : localStorage.getItem("userId"),
+			heroId : heroId
+		}
+		// request("POST", baseUrl + prefixUser +'addToFavourites', addToFavouritesCbk, data);
 	}
 }

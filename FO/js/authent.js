@@ -1,4 +1,4 @@
-
+var prefixUser = "user/";
 var signInBtn = document.querySelector("#signIn");
 var signUpBtn = document.querySelector("#signUp");
 var signInForm = document.querySelector("#signInForm");
@@ -16,15 +16,17 @@ function displayIsConnectedForms(connected = true){
 
 function displayIsConnectedNotifications(connected = true){
 	if (connected)
-		notify("You are connected. <br /> You can click on heroes card and then add them to your favourites.");
+		notify("You are connected. <br /> You can click on heroes cards and then add them to your favourites.");
 	else
-		notify("Connect to choose your favourites heroes.");
+		notify("Connect to choose your favourite heroes.");
 }
 
 //*********EVENTS
 logoutBtn.onclick = function(){
-	if (localStorage.getItem("connected"))
+	if (localStorage.getItem("connected")){
 		localStorage.removeItem("connected");
+		localStorage.removeItem("userId");
+	}
 	displayIsConnectedForms(false);
 	notify("You are not connected anymore.");
 }
@@ -42,7 +44,7 @@ signInBtn.onclick = function(e){
 			login : login,
 			password : pwd
 		}
-		request("POST", baseUrl + 'user/compare', signInBtnCbk, data);
+		request("POST", baseUrl + prefixUser +'login', signInBtnCbk, data);
 	}
 }
 
@@ -62,7 +64,7 @@ signUpBtn.onclick = function(e){
 			login : login,
 			password : pwd
 		}
-		request("POST", baseUrl + 'user/balance', signUpBtnCbk, data);
+		request("POST", baseUrl + prefixUser + 'create', signUpBtnCbk, data);
 	}
 }
 
@@ -71,8 +73,9 @@ function signInBtnCbk(xhr) {
 	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
 		localStorage.setItem("connected", true);
+		localStorage.setItem("userId", response['userId']);
 		displayIsConnectedForms(true);
-		notify("You can select your favourites heroes.");
+		notify("You can select your favourite heroes.");
 		//Get the favourites of the user
 	}
 	else

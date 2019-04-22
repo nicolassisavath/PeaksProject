@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\LightHero;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +21,7 @@ class MarvelController extends AbstractController
 	 * @param  Request $request [description]
 	 * @return [type]           [description]
 	 */
-	public function getCharactersList(Request $request)
+	public function getCharactersList(Request $request): Response
 	{
 		$offset = $request->query->get('offset');
 		$offset = $offset == null ? 100 : $offset;
@@ -52,7 +53,6 @@ class MarvelController extends AbstractController
 		if ($err) {
 			echo "cURL Error #:" . $err;
 		} else {
-
 			//We select only the required fields for the returned reponse
 	  		$json = json_decode($response);
 
@@ -64,13 +64,14 @@ class MarvelController extends AbstractController
 	  		$result['heroes'] = [];
 			$heroes = $json->data->results;
 			foreach ($heroes as $hero) {
-				$lightHero['id'] = $hero->id;
-				$lightHero['name'] = $hero->name;
-				$lightHero['description'] = $hero->description;
-				$lightHero['path'] = $hero->thumbnail->path;
-				$lightHero['extension'] = $hero->thumbnail->extension;
+				$lightHero = new LightHero();
+				$lightHero->setId($hero->id)
+				      	  ->setName($hero->name)
+				      	  ->setDescription($hero->description)
+				      	  ->setPath($hero->thumbnail->path)
+				      	  ->setExtension($hero->thumbnail->extension);
 
-				$result['heroes'][] = $lightHero;
+				$result['heroes'][] = $lightHero->get_object_as_array();
 			}
   			return new Response(json_encode($result));
 		}
@@ -80,7 +81,7 @@ class MarvelController extends AbstractController
 	/**
 	 * @Route("/getThreeFirstComicsByCharacterId", methods={"GET"})
 	 */
-	public function getThreeFirstComicsByCharacterId(Request $request)
+	public function getThreeFirstComicsByCharacterId(Request $request): Response
 	{
 		if ( ($heroId = $request->query->get('id') ) !== null)
 		{
@@ -121,7 +122,6 @@ class MarvelController extends AbstractController
 			return new JsonResponse(["nope" => "bug"]);
 		}
 	}
-
 
 	/**
 	 * @Route("/GetById", methods={"GET"})
