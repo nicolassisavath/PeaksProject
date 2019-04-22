@@ -53,9 +53,14 @@ class MarvelController extends AbstractController
 
 			//We select only the required fields for the returned reponse
 	  		$json = json_decode($response);
-			$heroes = $json->data->results;
 
-			$lightResponse = [];
+	  		//limit and total fields are required for pagination of heroes
+	  		$result['total'] = $json->data->total;
+	  		$result['limit'] = $json->data->limit;
+	  		$result['offset'] = $json->data->offset;
+
+	  		$result['heroes'] = [];
+			$heroes = $json->data->results;
 			foreach ($heroes as $hero) {
 				$lightHero['id'] = $hero->id;
 				$lightHero['name'] = $hero->name;
@@ -63,7 +68,7 @@ class MarvelController extends AbstractController
 				$lightHero['path'] = $hero->thumbnail->path;
 				$lightHero['extension'] = $hero->thumbnail->extension;
 
-				$result[] = $lightHero;
+				$result['heroes'][] = $lightHero;
 			}
   			return new Response(json_encode($result));
 		}
@@ -81,7 +86,7 @@ class MarvelController extends AbstractController
 
 			curl_setopt_array($curl, array(
 			  CURLOPT_PORT => "443",
-			  CURLOPT_URL => "https://gateway.marvel.com:443/v1/public/characters/".$heroId."/comics?format=comic&formatType=comic&orderBy=onsaleDate&limit=3&ts=1&apikey=5f9fafa4c65f4c31bc15b9301203835f&hash=c2376eedba988967c6a18a5f9bc4d41a",
+			  CURLOPT_URL => "https://gateway.marvel.com:443/v1/public/characters/".$heroId."/comics?format=comic&formatType=comic&orderBy=focDate&limit=3&ts=1&apikey=5f9fafa4c65f4c31bc15b9301203835f&hash=c2376eedba988967c6a18a5f9bc4d41a",
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => "",
 			  CURLOPT_MAXREDIRS => 10,

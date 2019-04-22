@@ -29,6 +29,7 @@ header{
 
 #logout{
 	height: 30px;
+	margin: auto;
 }
 
 /************ MAIN ***********/
@@ -42,15 +43,36 @@ main{
 
 #main{
 	border: 1px solid black;
+	width: 100%;
+}
+
+#paginationContainer{
+	border: 1px solid green;
+	text-align: center;
+	height: 50px;
+	line-height: 50px;
+}
+#heroesContainer{
 	display: flex;
 	justify-content: space-around;
-	width: 100%;
 	flex-wrap: wrap;
+	border: 1px solid pink;
+}
+.paginationBtn{
+	padding: 0 5px;
+}
+.paginationBtn:hover{
+	cursor: pointer;
 }
 /************ Sidebar ***********/
 #sidebar{
 	border: 1px solid green;
 	min-width: 300px;
+}
+
+#notifications{
+	padding: 15px;
+	color : red;
 }
 
 

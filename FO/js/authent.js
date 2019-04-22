@@ -1,8 +1,6 @@
 
 var signInBtn = document.querySelector("#signIn");
 var signUpBtn = document.querySelector("#signUp");
-// var displaySignUpFormBtn = document.querySelector("#displaySignUpForm");
-// var displaySignInFormBtn = document.querySelector("#displaySignInForm");
 var signInForm = document.querySelector("#signInForm");
 var signUpForm = document.querySelector("#signUpForm");
 var logoutBtn = document.querySelector("#logout");
@@ -16,19 +14,19 @@ function displayIsConnectedForms(connected = true){
 	display(logoutBtn, connected);
 }
 
-//Display or hide an element
-function display(element, display = true){
-	if (display)
-		element.classList.remove("hidden");
+function displayIsConnectedNotifications(connected = true){
+	if (connected)
+		notify("You are connected. <br /> You can click on heroes card and then add them to your favourites.");
 	else
-		element.classList.add("hidden");
+		notify("Connect to choose your favourites heroes.");
 }
 
 //*********EVENTS
 logoutBtn.onclick = function(){
-	if (localStorage.getItem("connecté"))
-		localStorage.removeItem("connecté");
+	if (localStorage.getItem("connected"))
+		localStorage.removeItem("connected");
 	displayIsConnectedForms(false);
+	notify("You are not connected anymore.");
 }
 
 signInBtn.onclick = function(e){
@@ -38,7 +36,7 @@ signInBtn.onclick = function(e){
 	var pwd = document.querySelector('#signInForm>input[name="password"]').value;
 
 	if (login == '' || pwd == '') 
-		alert('Tous les champs ne sont pas remplis'); // voir si on fait une notif
+		notify('Some fields are missing !'); // voir si on fait une notif
 	else {
 		var data = {
 			login : login,
@@ -56,9 +54,9 @@ signUpBtn.onclick = function(e){
 	var pwdConf = document.querySelector('#signUpForm>input[name="passwordConf"]').value;
 
 	if (login == '' || pwd == '' || pwdConf == '') 
-		alert('Tous les champs ne sont pas remplis');// voir si on fait une notif
+		notify('Some fields are missing !');// voir si on fait une notif
 	else if (pwd != pwdConf)
-		alert('Vos mots de passes sont differents')
+		notify('Passwords are different !');
 	else {
 		var data = {
 			login : login,
@@ -70,24 +68,23 @@ signUpBtn.onclick = function(e){
 
 //*********CALLBACKS
 function signInBtnCbk(xhr) {
+	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
-		var response = JSON.parse(xhr.responseText);
-		console.log(response);
-		localStorage.setItem("connecté", true);
+		localStorage.setItem("connected", true);
 		displayIsConnectedForms(true);
+		notify("You can select your favourites heroes.");
 		//Get the favourites of the user
-		//Display Add favourite on heroes cards
 	}
 	else
-		alert(xhr.responseText);
+		notify(response['status']);
 }
 
 function signUpBtnCbk(xhr) {
+	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
-		var response = JSON.parse(xhr.responseText);
-		console.log(response);
-		//Montrer le sign in form
+		notify("Your account is created.You can connect now.");
+		//Notifier
 	}
 	else
-		alert(xhr.responseText);
+		notify(response['status']);
 }

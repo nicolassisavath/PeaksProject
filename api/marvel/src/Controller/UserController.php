@@ -22,31 +22,32 @@ class UserController extends AbstractController
      * API : SignUp
      * @Route("/balance", methods={"POST"})
      */
-    public function balance(Request $request): Response
+    public function balance(Request $request, UserRepository $userRepository): Response
     {
         $post = json_decode(
             $request->getContent(),
             true
         ); 
 
-        //$get = $request->query;
-        $user = new User();
-
         if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
         {
-            $user->setLogin($login);
-            $user->setPassword(password_hash($pwd, PASSWORD_DEFAULT));
-            $user->setFavoritesNumber(0);
+            if ( ($dbUser = $userRepository->findByLogin($login)) !== null )
+                return new JsonResponse(["status" => "This login already exists."], 400);
+            else
+                $user = new User();
+                $user->setLogin($login);
+                $user->setPassword(password_hash($pwd, PASSWORD_DEFAULT));
+                $user->setFavoritesNumber(0);
 
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            return new JsonResponse(["code_statuette" => "Oui client crée"]);
+                return new JsonResponse(["status" => "The account was ceated successfully"]);
             //retourné le client aussi
         }
         else
-            return new JsonResponse(["code_statuette" => "nom pas bien"]);
+            return new JsonResponse(["status" => "Bad credentials."]);
     }
 
     /**
@@ -60,22 +61,16 @@ class UserController extends AbstractController
             true
         );    
 
-        if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
-        {
-            $dbUser = $userRepository->findByLogin($login);
-            if($dbUser !== null)
-            {
-                if (password_verify($pwd, $dbUser->getPassword()))
-                {
-                    return new JsonResponse(["statut" => "connecté"]);
-                }
-            }
-            return new JsonResponse(["statut" => "bad credentials"]);
-
-        }
+        if ( ($login = $post['login']) === null|| ($pwd = $post['password']) == null)
+            return new JsonResponse(["status" => "Some data are missing."], 400);
         else
         {
-            return new JsonResponse(["statut" => "données manquantes"]);
+            $dbUser = $userRepository->findByLogin($login);
+
+            if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
+                return new JsonResponse(["status" => "Connected."]);
+            else
+                return new JsonResponse(["status" => "Bad credentials."], 400);
         }
     }
 

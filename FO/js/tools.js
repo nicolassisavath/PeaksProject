@@ -1,3 +1,8 @@
+/*
+Functions and variables utilized in other script files
+ */
+
+
 var baseUrl = "http://localhost:8000/";
 	
 function request(method, url, callback = null, data = null) {
@@ -14,4 +19,23 @@ function request(method, url, callback = null, data = null) {
 		xhr.setRequestHeader("Content-Type", "application/json");
 	}
 	xhr.send(data);
+}
+
+//Display or hide an element
+function display(element, display = true){
+	if (display)
+		element.classList.remove("hidden");
+	else
+		element.classList.add("hidden");
+}
+
+//Display the connected status
+function isAuthent() {
+	return localStorage.getItem("connected");
+}
+
+//Notify the user in the sidebar
+function notify(message) {
+	var notifications = document.querySelector('#notifications');
+	notifications.innerHTML = message;
 }

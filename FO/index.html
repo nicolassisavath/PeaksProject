@@ -27,22 +27,34 @@
 				<input type="password" name="passwordConf" placeholder="Confirm your password"><br />
 				<button id="signUp">Sign Up</button>
 			</form>
+
+			<!-- LOGOUT -->
 			<button id="logout">Logout</button>
 		</div>
 	</header>
 	<main>
 		<section id="main">
+			<!-- PAGINATION CONTAINER -->
+			<div id="paginationContainer"></div>
+
+			<!-- HEROES CONTAINER -->
+			<div id="heroesContainer"></div>
+			
 			<!-- HERO DETAILS MODAL -->
 			<div id="heroDetailsModal" class="hidden">
 				<div class="modal-content">
 					<img id="modalImage" src="" alt="">
+
 					<div class="dataModal">
 						<b>Name</b>
 						<p id="modalName"></p>
+
 						<b>Description</b>
 						<p id="modalDescription"></p>
+
 						<b>Number of Appereances</b>
 						<p id="appNumberInComics"></p>
+
 						<b>Fist appearances</b>
 						<ul id="firstAppeareances"></ul>
 					</div>
@@ -50,12 +62,14 @@
 			</div>
 		</section>
 		<aside id="sidebar">
-			trehg
+			<!-- NOTIFICATIONS -->
+			<div id="notifications">trehg</div>
 		</aside>
 	</main>
 	<footer>
 		
 	</footer>
+
 	<script src="./js/tools.js"></script>
 	<script src="./js/authent.js"></script>
 	<script src="./js/heroes.js"></script>
