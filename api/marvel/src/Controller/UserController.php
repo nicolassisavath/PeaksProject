@@ -68,7 +68,7 @@ class UserController extends AbstractController
             $dbUser = $userRepository->findByLogin($login);
 
             if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
-                return new JsonResponse(["status" => "Connected."]);
+                return new JsonResponse(["status" => "Connected.", "userId" => $dbUser->getId()]);
             else
                 return new JsonResponse(["status" => "Bad credentials."], 400);
         }
