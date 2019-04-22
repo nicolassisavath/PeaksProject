@@ -1,0 +1,130 @@
+*{
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+.hidden{
+	display:none;
+}
+/************ HEADER ***********/
+header{
+	border: 1px solid red;
+	display: flex;
+	justify-content: space-around;
+}
+
+#logo{
+	display: block;
+	border: 1px solid black;
+	width: 250px;
+	height: 100px;
+	background:url(https://i.annihil.us/u/prod/misc/marvel.svg);
+}
+
+#userForms{
+	border: 1px solid blue;
+	display: flex;
+}
+
+#logout{
+	height: 30px;
+}
+
+/************ MAIN ***********/
+/************ Main Section ***********/
+main{
+	border: 1px solid blue;
+	display: flex;
+	justify-content: space-around;
+	min-height: 200px;
+}
+
+#main{
+	border: 1px solid black;
+	display: flex;
+	justify-content: space-around;
+	width: 100%;
+	flex-wrap: wrap;
+}
+/************ Sidebar ***********/
+#sidebar{
+	border: 1px solid green;
+	min-width: 300px;
+}
+
+
+
+
+/************ Hero Card ***********/
+.card:hover{
+	box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.8);
+}
+.card{
+	margin: 10px;
+	height: 300px;
+	width: 150px;
+	border-radius: 10px;
+	box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.5);
+}
+.cardName{
+	/*border:1px solid black;*/
+	border-radius: 10px 10px 0 0;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+	overflow: hidden;
+}
+.cardPicture{
+	/*border:1px solid blue;*/
+	height: 175px;
+	width: 150px;
+	cursor: pointer;
+}
+.cardDescription{
+	/*border:1px solid green;*/
+	border-radius: 0 0 10px 10px;
+	height: 65px;
+	overflow: hidden;
+	padding: 6px;
+}
+
+/******** HeroDetails Modal  *******/
+#heroDetailsModal{
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: white;
+  margin: auto;
+  padding: 20px;
+  width: 50%;
+  	display: flex;
+}
+.dataModal{
+	margin-left: 5px;
+	width: 50%;
+}
+
+.dataModal p{
+	margin: 5px 0 10px;
+}
+
+#firstAppeareances{
+	margin-left: 20px;
+}
+
+/************ FOOTER ***********/
+footer{
+	border: 1px solid green;
+	min-height: 100px;
+}

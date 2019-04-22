@@ -43,6 +43,7 @@ class UserController extends AbstractController
             $entityManager->flush();
 
             return new JsonResponse(["code_statuette" => "Oui client crée"]);
+            //retourné le client aussi
         }
         else
             return new JsonResponse(["code_statuette" => "nom pas bien"]);
@@ -65,15 +66,39 @@ class UserController extends AbstractController
             if($dbUser !== null)
             {
                 if (password_verify($pwd, $dbUser->getPassword()))
+                {
                     return new JsonResponse(["statut" => "connecté"]);
+                }
             }
             return new JsonResponse(["statut" => "bad credentials"]);
+
         }
         else
         {
             return new JsonResponse(["statut" => "données manquantes"]);
         }
     }
+
+//     /**
+//      * API : Login
+//      * @Route("/compare", methods={"POST"})
+//      */
+//     public function gjfd(Request $request)
+//     {
+//         $response = new JsonResponse(["statut" => "données manquantes"]);
+//         $response->setPublic();
+//             // $response->headers->set('Content-Type', 'xml');
+//             // $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
+//     // $response->headers->set('Access-Control-Allow-Origin', '*');
+//     // $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
+// // $response->headers[] = ['Access-Control-Allow-Headers'=> 'origin, content-type, accept'];
+// // $response->headers[] = ['Access-Control-Allow-Origin', '*'];
+// // $response->headers[] = ['Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS'];
+
+// // var_dump($response);
+//         return $response;
+//         // return new JsonResponse(["statut" => "données manquantes"]);
+//     }
 
 
 

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="./style/style.css">
+</head>
+<body>
+	<header>
+		<div id="logoContainer">
+			<a id="logo" href="." ></a>
+		</div>
+		<div id="userForms">
+			<!-- LOGIN FORM -->
+			<form id="signInForm">
+				<h3>Login</h3>	
+				<input type="text" name="login" placeholder="Write your login"><br />
+				<input type="password" name="password" placeholder="Write your password"><br />
+				<button id="signIn">Sign In</button>
+			</form>
+			
+			<!-- NEW ACCOUNT FORM -->
+			<form id="signUpForm">
+				<h3>Create New Account</h3>	
+				<input type="text" name="login" placeholder="Write your login"><br />
+				<input type="password" name="password" placeholder="Write your password"><br />
+				<input type="password" name="passwordConf" placeholder="Confirm your password"><br />
+				<button id="signUp">Sign Up</button>
+			</form>
+			<button id="logout">Logout</button>
+		</div>
+	</header>
+	<main>
+		<section id="main">
+			<!-- HERO DETAILS MODAL -->
+			<div id="heroDetailsModal" class="hidden">
+				<div class="modal-content">
+					<img id="modalImage" src="" alt="">
+					<div class="dataModal">
+						<b>Name</b>
+						<p id="modalName"></p>
+						<b>Description</b>
+						<p id="modalDescription"></p>
+						<b>Number of Appereances</b>
+						<p id="appNumberInComics"></p>
+						<b>Fist appearances</b>
+						<ul id="firstAppeareances"></ul>
+					</div>
+				</div>
+			</div>
+		</section>
+		<aside id="sidebar">
+			trehg
+		</aside>
+	</main>
+	<footer>
+		
+	</footer>
+	<script src="./js/tools.js"></script>
+	<script src="./js/authent.js"></script>
+	<script src="./js/heroes.js"></script>
+	<script src="./js/script.js"></script>
+</body>
+</html>
