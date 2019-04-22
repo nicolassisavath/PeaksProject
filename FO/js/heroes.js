@@ -48,7 +48,6 @@ function createHeroCard(hero, isFavorite = false)
 		cardFooter.classList.add('cardDescription');
 	}
 
-
 	return card;
 }
 
@@ -56,8 +55,8 @@ function getModalDetails(element, id) {
 	// transfer hero data from the card to the modal
 	transfertDetailsToModal(element, id);
 
-	url = baseUrl + prefixHeroes + 'getThreeFirstComicsByCharacterId?id=' + id;
 	// request additional data about comics and display in the modal
+	url = baseUrl + prefixHeroes + 'getThreeFirstComicsByCharacterId?id=' + id;
 	request("GET", url, displayModalCbk); 
 }
 

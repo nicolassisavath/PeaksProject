@@ -23,10 +23,11 @@ function displayIsConnectedNotifications(connected = true){
 
 //*********EVENTS
 logoutBtn.onclick = function(){
-	if (localStorage.getItem("connected")){
-		localStorage.removeItem("connected");
-		localStorage.removeItem("userId");
-	}
+	localStorage.removeItem("connected");
+	localStorage.removeItem("userId");
+	localStorage.removeItem("favouritesId");
+	favouritesContainer.innerHTML = '';
+
 	displayIsConnectedForms(false);
 	notify("You are not connected anymore.");
 }
@@ -38,7 +39,7 @@ signInBtn.onclick = function(e){
 	var pwd = document.querySelector('#signInForm>input[name="password"]').value;
 
 	if (login == '' || pwd == '') 
-		notify('Some fields are missing !'); // voir si on fait une notif
+		notify('Some fields are missing !');
 	else {
 		var data = {
 			login : login,
@@ -56,7 +57,7 @@ signUpBtn.onclick = function(e){
 	var pwdConf = document.querySelector('#signUpForm>input[name="passwordConf"]').value;
 
 	if (login == '' || pwd == '' || pwdConf == '') 
-		notify('Some fields are missing !');// voir si on fait une notif
+		notify('Some fields are missing !');
 	else if (pwd != pwdConf)
 		notify('Passwords are different !');
 	else {
@@ -96,21 +97,3 @@ function signUpBtnCbk(xhr) {
 	else
 		notify(response['status']);
 }
-
-// function displayFavourites(favouritesId){
-// 	favouritesContainer.innerHTML = '';
-// 	favouritesId.forEach(favouriteId => {
-// 		request("GET", baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId, displayFavouriteCbk)
-// 	});
-// }
-
-// function displayFavouriteCbk(xhr){
-// 	if (xhr.status == 200) {
-// 		var hero = JSON.parse(xhr.responseText);
-
-// 		var cardFavourite = createHeroCard(hero);  
-// 		favouritesContainer.appendChild(cardFavourite);
-// 	}	
-// 	else
-// 		notify("An error occured.")
-// }
