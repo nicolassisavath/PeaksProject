@@ -124,7 +124,7 @@ class MarvelController extends AbstractController
 	}
 
 	/**
-	 * @Route("/GetById", methods={"GET"})
+	 * @Route("/getCharacterById", methods={"GET"})
 	 */
 	public function getCharacterById(Request $request)
 	{
@@ -150,8 +150,11 @@ class MarvelController extends AbstractController
 
 			$response = curl_exec($curl);
 			$err = curl_error($curl);
-
 			curl_close($curl);
+
+	  		$json = json_decode($response);
+			$hero = $json->data->results[0];
+			
 
 			if ($err) {
 			  	echo "cURL Error #:" . $err;

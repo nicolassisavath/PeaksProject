@@ -141,7 +141,7 @@ class UserController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            return new JsonResponse(["response" => "Favourite added"]);
+            return new JsonResponse(["response" => "Favourite added", "addedFavouriteId" => $dbHero->getMarvelId()]);
         }            
     }
 
@@ -171,11 +171,12 @@ class UserController extends AbstractController
             {
                 $user->removeHero($dbHero);
                 $user->decrementFavoritesNumber();
+                $em = $this->getDoctrine()->getManager();
                 $em->persist($user);
                 $em->flush();
             }
 
-            return new JsonResponse(["response" => "Favourite added"]);
+            return new JsonResponse(["response" => "Favourite added",  "removedFavouriteId" => $dbHero->getMarvelId()]);
         }            
     }
 

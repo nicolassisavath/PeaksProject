@@ -4,6 +4,8 @@ Functions and variables utilized in other script files
 
 
 var baseUrl = "http://localhost:8000/api/";
+var prefixHeroes = "marvel/";
+var prefixUser = "user/";
 	
 function request(method, url, callback = null, data = null) {
 	var xhr = new XMLHttpRequest();

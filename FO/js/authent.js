@@ -1,9 +1,9 @@
-var prefixUser = "user/";
 var signInBtn = document.querySelector("#signIn");
 var signUpBtn = document.querySelector("#signUp");
 var signInForm = document.querySelector("#signInForm");
 var signUpForm = document.querySelector("#signUpForm");
 var logoutBtn = document.querySelector("#logout");
+var favouritesContainer = document.querySelector('#favouritesContainer')
 
 
 //Display the signInForm, the signUpForm and logout button
@@ -76,6 +76,11 @@ function signInBtnCbk(xhr) {
 		localStorage.setItem("userId", response['userId']);
 		displayIsConnectedForms(true);
 		notify("You can select your favourite heroes.");
+
+		var favouritesId = response['favourites'];
+		localStorage.setItem("favouritesId", favouritesId);
+		displayFavourites();
+
 		//Get the favourites of the user
 	}
 	else
@@ -91,3 +96,21 @@ function signUpBtnCbk(xhr) {
 	else
 		notify(response['status']);
 }
+
+// function displayFavourites(favouritesId){
+// 	favouritesContainer.innerHTML = '';
+// 	favouritesId.forEach(favouriteId => {
+// 		request("GET", baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId, displayFavouriteCbk)
+// 	});
+// }
+
+// function displayFavouriteCbk(xhr){
+// 	if (xhr.status == 200) {
+// 		var hero = JSON.parse(xhr.responseText);
+
+// 		var cardFavourite = createHeroCard(hero);  
+// 		favouritesContainer.appendChild(cardFavourite);
+// 	}	
+// 	else
+// 		notify("An error occured.")
+// }
