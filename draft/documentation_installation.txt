@@ -1,0 +1,15 @@
+Apres la recuperation des sources git
+	Git clone *******(mettre en public surement)
+	**********Ou envoyer le fichier zip
+
+Aller dans test2/api/marvel
+	Cd "chemin"
+Lancer la comande
+	Composer install
+Lancer le serveur symfony
+	php -S 127.0.0.1:8000 -t public
+
+*********
+
+
+Placer le fichier FO dans le server web apache local, puis lancer le fichier index.html via le navigateur

@@ -377,15 +377,15 @@ function addToFavouritesCbk(xhr) {
  * Call the server side api to get details of character by id
  */
 function displayFavourites(){
+	if (localStorage.getItem("favouritesId") == null)
+		return ;
+	
 	favouritesId = localStorage.getItem("favouritesId").split(",");
-
-	if (favouritesId == null)
-		return;
 
 	favouritesContainer.innerHTML = '';
 	favouritesId.forEach(favouriteId => {
 		url = baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId;
-		request("GET", , displayFavouriteCbk);
+		request("GET", url, displayFavouriteCbk);
 	});
 }
 
