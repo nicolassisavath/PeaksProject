@@ -10,6 +10,6 @@ window.onload = function(){
 	//Display the heroes cards
 	displayHeroes();
 
+	//Display the favourites
 	displayFavourites();
-
 }

@@ -1,77 +1,252 @@
-var heroesDisplayer = document.querySelector("#heroesContainer");
-var modal = document.querySelector("#heroDetailsModal");
-var cardPictureFormat = "portrait_xlarge";
-var modalPictureFormat = "portrait_uncanny";
-var sizePage = 20;
-var initialOffset = 100;
+var heroesDisplayer = document.querySelector("#heroesContainer");// Container of the heroes cards
+var modal = document.querySelector("#heroDetailsModal");// Modal for hero details
+var cardPictureFormat = "portrait_xlarge";// Format of the cards pictures
+var modalPictureFormat = "portrait_uncanny";// Format of the details modal picture
+var sizePage = 20;// Number of hero cards par page
+var initialOffset = 100;// Default offset of pagination
 
 //******************* TOOLS
+
+/*
+ * Call Server API that returns list of heroes according to offset and limit
+ * Called at the onload of the page and on pagination button onclick.
+ */
 function displayHeroes(offset = initialOffset, limit = sizePage){
-	var url = baseUrl + prefixHeroes + 'getCharactersList?limit=' + limit + "&offset=" + offset;
+	var url = baseUrl + prefixHeroes + "getCharactersList?";
+	url += "limit=" + limit;
+	url += "&offset=" + offset;
 	request("GET", url, displayHeroesCbk);
 }
 
+function displayHeroesCbk(xhr){
+	if (xhr.status == 200) {
+		var response = JSON.parse(xhr.responseText);
+
+		//Pagination
+		var offset = response['offset'];
+		var limit = response['limit'];
+		var total = response['total'];
+		paginate(offset, limit, total);
+
+		//Dislay Heroes Cards
+		var heroes = response['heroes'];
+		heroesDisplayer.innerHTML = '';
+	
+		heroes.forEach(hero => {
+			var card = createHeroCard(hero);  
+			heroesDisplayer.appendChild(card);
+		});
+	}
+	else
+		notify("An internal error occured.");
+}
+
+/*** CARD HERO***/
+
+/*
+ * Return card to display hero with 
+ * name
+ * picture 
+ * description or "Remove from favourites" button
+ */
 function createHeroCard(hero, isFavorite = false)
 {
 	let card = document.createElement('div');
 	card.classList.add('card');
 
-	//Name
-	let cardName = document.createElement('div');
+	// Name
+	// To test
+	let cardName = createCardName(hero);
 	card.appendChild(cardName);
-	cardName.innerHTML = hero['name'];
-	cardName.classList.add('cardName');
+	
+	// let cardName = document.createElement('div');
+	// card.appendChild(cardName);
+	// cardName.innerHTML = hero['name'];
+	// cardName.classList.add('cardName');
 
-	//Picture
-	let cardPicture = document.createElement('img');
+	// Picture
+	// To test
+	let cardPicture = createCardPicture(hero);
 	card.appendChild(cardPicture);
-	urlPicture = hero['path'] + "/portrait_xlarge." + hero['extension']
-	cardPicture.src = urlPicture;
-	cardPicture.setAttribute("onclick", "getModalDetails(this, " + hero['id'] + ")");
-	cardPicture.classList.add('cardPicture');
+	// let cardPicture = document.createElement('img');
+	// card.appendChild(cardPicture);
+	// urlPicture = hero['path'] + "/" + cardPictureFormat + "." + hero['extension']
+	// cardPicture.src = urlPicture;
+	// cardPicture.setAttribute("onclick", "getModalDetails(this, " + hero['id'] + ")");
+	// cardPicture.classList.add('cardPicture');
 
-	//Card Footer
-	let cardFooter = document.createElement('div');
+	// Card Footer
+	//To test
+	let cardFooter = createCardFooter(hero, isFavorite);
 	card.appendChild(cardFooter);
 
-	if (isFavorite){
-		//Remove from favourite Btn
-		let removeFromFavouritesBtn = document.createElement('button');
-		removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")")
-		removeFromFavouritesBtn.innerHTML = "Remove from favourites"
-		removeFromFavouritesBtn.classList.add('btn');
-		cardFooter.append(removeFromFavouritesBtn);
-	}
-	else {
-		//Description
-		cardFooter.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
-		cardFooter.classList.add('cardDescription');
-	}
+	// let cardFooter = document.createElement('div');
+	// card.appendChild(cardFooter);
+
+	// if (isFavorite){
+	// 	// Remove from favourite Btn
+	// 	let removeFromFavouritesBtn = document.createElement('button');
+	// 	removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")")
+	// 	removeFromFavouritesBtn.innerHTML = "Remove from favourites"
+	// 	removeFromFavouritesBtn.classList.add('btn');
+	// 	cardFooter.append(removeFromFavouritesBtn);
+	// }
+	// else {
+	// 	// Description
+	// 	cardFooter.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
+	// 	cardFooter.classList.add('cardDescription');
+	// }
 
 	return card;
 }
 
-function getModalDetails(element, id) {
+/*
+ * Return card Name element
+ */
+function createCardName(hero){
+	let cardName = document.createElement('div');
+	cardName.classList.add('cardName');
+
+	cardName.innerHTML = hero['name'];
+
+	return cardName;
+}
+
+/*
+ * Return card Picture element
+ */
+function createCardPicture(hero){
+	let cardPicture = document.createElement('img');
+	cardPicture.classList.add('cardPicture');
+
+	// Set the source url of the picture
+	urlPicture = hero['path'] + "/" + cardPictureFormat + "." + hero['extension']
+	cardPicture.src = urlPicture;
+
+	// Add event onclick on picture => display modal details of the hero
+	cardPicture.setAttribute("onclick", "getModalDetails(this, " + hero['id'] + ")");
+
+	return cardPicture;
+}
+
+/*
+ * Return card Footer element
+ */
+function createCardFooter(hero, isFavouriteCard){
+	let cardFooter = document.createElement('div');
+	cardFooter.classList.add('cardDescription');
+
+	if (isFavouriteCard){// We create and put the button "Remove from favourites"
+	// To test
+	let removeFromFavouritesBtn = createRemoveBtn(hero);
+	cardFooter.appendChild(removeFromFavouritesBtn);
+
+		// let removeFromFavouritesBtn = document.createElement('button');
+		// removeFromFavouritesBtn.classList.add('btn');
+		// // Add event onclick on button => call server api to remove the hero from user favourites
+		// removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")")
+		// removeFromFavouritesBtn.innerHTML = "Remove from favourites"
+		// cardFooter.append(removeFromFavouritesBtn);
+	}
+	else //  We put the description
+		cardFooter.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
+
+	return cardFooter;
+}
+
+/*
+ * Return "Remove from favourites" button
+ */
+function createRemoveBtn(hero){
+	let removeFromFavouritesBtn = document.createElement('button');
+	removeFromFavouritesBtn.classList.add('btn');
+
+	// Add event onclick on button => call server api to remove the hero from user favourites
+	removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")");
+	removeFromFavouritesBtn.innerHTML = "Remove from favourites";
+
+	return removeFromFavouritesBtn;
+}
+
+/*** CARD HERO ***/
+
+/*** DETAILS MODAL HERO ***/
+
+/*
+ * Call Server API that returns hero details according to offset and limit
+ * Called at hero card picture onclick.
+ */
+function getModalDetails(pictureElmt, id) {
+	// put the hero id on the modal
+	// for removing/adding to favourites server api calls
+	modal.setAttribute("data-id", id);
+
 	// transfer hero data from the card to the modal
-	transfertDetailsToModal(element, id);
+	var cardElmt = pictureElmt.parentElement;
+	transferDetailsToModal(cardElmt, id);
 
 	// request additional data about comics and display in the modal
 	url = baseUrl + prefixHeroes + 'getThreeFirstComicsByCharacterId?id=' + id;
 	request("GET", url, displayModalCbk); 
 }
 
-function transfertDetailsToModal(element, id){
-	modal.setAttribute("data-id", id);
-	var card = element.parentElement;
+function transferDetailsToModal(card, id){
+	//On transfère les données déjà présentes dans la card
+	//pour éviter une requête supplémentaire sur le héros
 
-	//On recupère les données déjà présentes dans le DOM 
-	//pour ne pas faire de requête sur le héro
+	//Name
 	modal.querySelector("#modalName").innerText = card.querySelector(".cardName").innerText;
+	//Description ?? cas du favoris...
 	modal.querySelector("#modalDescription").innerText = card.querySelector(".cardDescription").innerText;
-
-	var image= card.querySelector(".cardPicture").src;
-	modal.querySelector("#modalImage").src = image.replace("portrait_xlarge", "portrait_uncanny");
+	//Image
+	var image = card.querySelector(".cardPicture").src;
+	modal.querySelector("#modalImage").src = image.replace(cardPictureFormat, modalPictureFormat);
 }
+
+function displayModalCbk(xhr){
+	if (xhr.status == 200) {
+		var response = JSON.parse(xhr.responseText)['data'];
+
+		//Number of appearances in comics
+		var count = response['total'];
+		modal.querySelector('#appNumberInComics').innerText = count;
+
+		//3 first commics
+		var comics = response['results'];
+		var list = modal.querySelector('#firstAppeareances');
+		list.innerHTML = '';
+		comics.forEach(comic =>{
+			var item = document.createElement('li');
+			list.appendChild(item);
+			item.innerHTML = comic['title'];
+		})
+
+		//Displpay or hide "Add Favourite" button
+		var addFavBtn = modal.querySelector("#favoriteBtn");
+		var heroId = modal.getAttribute("data-id");
+		var showFavBtn = isAuthent() && !isHeroFavourite(heroId);
+		display(addFavBtn, showFavBtn);
+
+		if (showFavBtn)
+			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
+		
+		display(modal);
+	}
+	else
+		notify("An internal error occured.");
+}
+
+/*
+ * We hide the modal if user click on it
+ */
+window.onclick = function(event) {
+	if (event.target == modal) 
+		display(modal, false);
+}
+
+/*** DETAILS MODAL HERO ***/
+
+/*** PAGINATION OF HEROES CARDS ***/
 
 function paginate(offset, limit, total){
 	var paginationContainer = document.querySelector("#paginationContainer");
@@ -114,70 +289,15 @@ function paginate(offset, limit, total){
 		}
 	}
 }
-//******************* EVENTS
-window.onclick = function(event) {
-	if (event.target == modal) 
-		display(modal, false);
-}
 
-//******************* CALLBACKS
-function displayHeroesCbk(xhr){
-	if (xhr.status == 200) {
-		var response = JSON.parse(xhr.responseText);
+/*** PAGINATION OF HEROES CARDS ***/
 
-		//Pagination
-		var offset = response['offset'];
-		var limit = response['limit'];
-		var total = response['total'];
-		paginate(offset, limit, total);
-
-		//Dislay Heroes Cards
-		var heroes = response['heroes'];
-		heroesDisplayer.innerHTML = '';
-	
-		heroes.forEach(hero => {
-			var card = createHeroCard(hero);  
-			heroesDisplayer.appendChild(card);
-		});
-	}
-}
-
-function displayModalCbk(xhr){
-	if (xhr.status == 200) {
-		var response = JSON.parse(xhr.responseText)['data'];
-
-		//Number of appearances in comics
-		var count = response['total'];
-		modal.querySelector('#appNumberInComics').innerText = count;
-
-		//3 first commics
-		var comics = response['results'];
-		var list = modal.querySelector('#firstAppeareances');
-		list.innerHTML = '';
-		comics.forEach(comic =>{
-			var item = document.createElement('li');
-			list.appendChild(item);
-			item.innerHTML = comic['title'];
-		})
-
-		//Displpay or hide Add Favourite button
-		var addFavBtn = modal.querySelector("#favoriteBtn");
-		var heroId = modal.getAttribute("data-id");
-		var showFavBtn = isAuthent() && !isHeroFavourite(heroId);
-		display(addFavBtn, showFavBtn);
-
-		if (showFavBtn)
-			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
-		
-		display(modal);
-	}
-}
+//******************* FAVOURITES
 
 function isHeroFavourite(heroId){
 	favouritesId = localStorage.getItem("favouritesId").split(",");
 	return favouritesId.indexOf(heroId) != -1 ;
 }
-
 
 function addToFavourites(heroId){
 	if (!isAuthent())
@@ -264,3 +384,5 @@ function updateFavouritesStorage(heroId, add = true) {
 	localStorage.setItem("favouritesId", favouritesId);
 	displayFavourites();
 }
+
+//******************* FAVOURITES

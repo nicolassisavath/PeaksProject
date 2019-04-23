@@ -81,8 +81,6 @@ function signInBtnCbk(xhr) {
 		var favouritesId = response['favourites'];
 		localStorage.setItem("favouritesId", favouritesId);
 		displayFavourites();
-
-		//Get the favourites of the user
 	}
 	else
 		notify(response['status']);
