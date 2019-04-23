@@ -2,10 +2,10 @@ window.onload = function(){
 	//*********INITIALIZATION
 
 	//Display Connection Forms or hide them if user already connected
-	displayIsConnectedForms(isAuthent());
+	displayIsConnectedForms();
 
 	//Display notifications
-	displayIsConnectedNotifications(isAuthent());
+	displayIsConnectedNotifications();
 
 	//Display the heroes cards
 	displayHeroes();

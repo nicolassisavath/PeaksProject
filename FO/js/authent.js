@@ -6,16 +6,21 @@ var logoutBtn = document.querySelector("#logout");
 var favouritesContainer = document.querySelector('#favouritesContainer')
 
 
-//Display the signInForm, the signUpForm and logout button
-//in function of the connected status
-function displayIsConnectedForms(connected = true){
-	display(signInForm, !connected);
-	display(signUpForm, !connected);
-	display(logoutBtn, connected);
+/* 
+ * Display the signInForm, the signUpForm and logout button
+ * in function of the connected status
+ */
+function displayIsConnectedForms(){
+	display(signInForm, !isAuthent());
+	display(signUpForm, !isAuthent());
+	display(logoutBtn, isAuthent());
 }
 
-function displayIsConnectedNotifications(connected = true){
-	if (connected)
+/*
+ * Display notifications according to the conncetion status
+ */
+function displayIsConnectedNotifications(){
+	if (isAuthent())
 		notify("You are connected. <br /> You can click on heroes cards and then add them to your favourites.");
 	else
 		notify("Connect to choose your favourite heroes.");
@@ -28,13 +33,16 @@ logoutBtn.onclick = function(){
 	localStorage.removeItem("favouritesId");
 	favouritesContainer.innerHTML = '';
 
-	displayIsConnectedForms(false);
+	displayIsConnectedForms();
 	notify("You are not connected anymore.");
 }
 
+/* 
+ * Call the server side api to check login & password
+ */
 signInBtn.onclick = function(e){
 	e.preventDefault();
-	//on recupère les valeurs de login et password
+	// on recupère les valeurs de login et password
 	var login = document.querySelector('#signInForm>input[name="login"]').value;
 	var pwd = document.querySelector('#signInForm>input[name="password"]').value;
 
@@ -49,6 +57,9 @@ signInBtn.onclick = function(e){
 	}
 }
 
+/* 
+ * Call the server side api to create a new account
+ */
 signUpBtn.onclick = function(e){
 	e.preventDefault();
 	//on recupère les valeurs de login et password
@@ -69,14 +80,19 @@ signUpBtn.onclick = function(e){
 	}
 }
 
-//*********CALLBACKS
+/*
+ * Handle the connection:
+ *		- notify the connected user
+ *		- save his favourites in localStorage
+ *		- display his favourites
+ */
 function signInBtnCbk(xhr) {
 	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
 		localStorage.setItem("connected", true);
 		localStorage.setItem("userId", response['userId']);
-		displayIsConnectedForms(true);
-		notify("You can select your favourite heroes.");
+		displayIsConnectedForms();
+		notify("You are connected. You can select your favourite heroes.");
 
 		var favouritesId = response['favourites'];
 		localStorage.setItem("favouritesId", favouritesId);
@@ -86,11 +102,13 @@ function signInBtnCbk(xhr) {
 		notify(response['status']);
 }
 
+/*
+ * Notify the user of his creation account status
+ */
 function signUpBtnCbk(xhr) {
 	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
-		notify("Your account is created.You can connect now.");
-		//Notifier
+		notify("YCreation succeeded.You can connect now to rou account.");
 	}
 	else
 		notify(response['status']);

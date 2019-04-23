@@ -18,6 +18,9 @@ function displayHeroes(offset = initialOffset, limit = sizePage){
 	request("GET", url, displayHeroesCbk);
 }
 
+/*
+ * Display heroes cards and the pagination element
+ */
 function displayHeroesCbk(xhr){
 	if (xhr.status == 200) {
 		var response = JSON.parse(xhr.responseText);
@@ -168,13 +171,27 @@ function createRemoveBtn(hero){
 	return removeFromFavouritesBtn;
 }
 
+/*
+ * Test, need to bind to modal=> displayModalCbk
+ * Return "Add to favourites" button
+ */
+function createAddBtn(hero){
+	let addToFavouritesBtn = document.createElement('button');
+	addToFavouritesBtn.classList.add('btn');
+
+	// Add event onclick on button => call server api to add the hero to user favourites
+	addToFavouritesBtn.setAttribute("onclick", "addToFavourites(" + hero['id'] + ")");
+	addToFavouritesBtn.innerHTML = "Add to favourites";
+
+	return addToFavouritesBtn;
+}
 /*** CARD HERO ***/
 
 /*** DETAILS MODAL HERO ***/
 
 /*
  * Call Server API that returns hero details according to offset and limit
- * Called at hero card picture onclick.
+ * Called when hero card picture onclick.
  */
 function getModalDetails(pictureElmt, id) {
 	// put the hero id on the modal
@@ -185,11 +202,15 @@ function getModalDetails(pictureElmt, id) {
 	var cardElmt = pictureElmt.parentElement;
 	transferDetailsToModal(cardElmt, id);
 
-	// request additional data about comics and display in the modal
+	// request additional data about comics and display them in the modal
 	url = baseUrl + prefixHeroes + 'getThreeFirstComicsByCharacterId?id=' + id;
 	request("GET", url, displayModalCbk); 
 }
 
+/*
+ * Transfer the name/image et description from the hero card to the modal
+ * Avoid a request to the marvel character api
+ */
 function transferDetailsToModal(card, id){
 	//On transfère les données déjà présentes dans la card
 	//pour éviter une requête supplémentaire sur le héros
@@ -203,6 +224,12 @@ function transferDetailsToModal(card, id){
 	modal.querySelector("#modalImage").src = image.replace(cardPictureFormat, modalPictureFormat);
 }
 
+/*
+ * Display in the modal:
+ *	- the number of appearances in comics
+ *	- the 3 first comics
+ *	- the Add/Remove favourite button
+ */
 function displayModalCbk(xhr){
 	if (xhr.status == 200) {
 		var response = JSON.parse(xhr.responseText)['data'];
@@ -213,15 +240,15 @@ function displayModalCbk(xhr){
 
 		//3 first commics
 		var comics = response['results'];
-		var list = modal.querySelector('#firstAppeareances');
-		list.innerHTML = '';
+		var firstAppeareances = modal.querySelector('#firstAppeareances');
+		firstAppeareances.innerHTML = '';
 		comics.forEach(comic =>{
 			var item = document.createElement('li');
-			list.appendChild(item);
+			firstAppeareances.appendChild(item);
 			item.innerHTML = comic['title'];
 		})
 
-		//Displpay or hide "Add Favourite" button
+		//Display or hide "Add Favourite" button
 		var addFavBtn = modal.querySelector("#favoriteBtn");
 		var heroId = modal.getAttribute("data-id");
 		var showFavBtn = isAuthent() && !isHeroFavourite(heroId);
@@ -229,6 +256,8 @@ function displayModalCbk(xhr){
 
 		if (showFavBtn)
 			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
+		//???????? Gerer le removeFavBtn??? => ajouter sur html
+		// Ou gerer le createFavouriteBtn comme createRemoveBtn
 		
 		display(modal);
 	}
@@ -237,7 +266,7 @@ function displayModalCbk(xhr){
 }
 
 /*
- * We hide the modal if user click on it
+ * We hide the modal if user clicks on it
  */
 window.onclick = function(event) {
 	if (event.target == modal) 
@@ -248,19 +277,27 @@ window.onclick = function(event) {
 
 /*** PAGINATION OF HEROES CARDS ***/
 
+/*
+ * Display the pagination element
+ */
 function paginate(offset, limit, total){
 	var paginationContainer = document.querySelector("#paginationContainer");
-	var pagination = document.querySelector("#pagination");
+	var pagination = document.querySelector("#pagination");//????Encore utile?
 
 	paginationContainer.innerHTML = '';
 
 	var max = Math.ceil(total/limit); // get the maximim number of pages
-	if (max > 1){
+
+	if (max <= 1){
+		return;
+	}
+	else {
 		var pagination = document.createElement('select');
+		// Add event onchange => display heroes with the selected offset
 		pagination.setAttribute("onclick", "displayHeroes(this.value)");
 		for(var i = 1; i <= max; i++){
 			var option = document.createElement('option');
-			option.value = (i-1) * limit;
+			option.value = (i-1) * limit; // put the corresponding offset as value
 			option.innerHTML = i;
 			if (option.value == offset)
 				option.selected = true;
@@ -294,15 +331,23 @@ function paginate(offset, limit, total){
 
 //******************* FAVOURITES
 
+/*
+ * Return if the hero is already a favourite of the connected user
+ */
 function isHeroFavourite(heroId){
-	favouritesId = localStorage.getItem("favouritesId").split(",");
+	var favouritesId = localStorage.getItem("favouritesId").split(",");
+
 	return favouritesId.indexOf(heroId) != -1 ;
 }
 
+/*
+ * Call the server side api to add the hero to the user's favourites
+ */
 function addToFavourites(heroId){
 	if (!isAuthent())
 		return;
 	else{
+		// we send the userId and heroId to server side api
 		var data = {
 			userId : localStorage.getItem("userId"),
 			heroId : heroId
@@ -311,6 +356,10 @@ function addToFavourites(heroId){
 	}
 }
 
+/*
+ * Update the favourites stored in localStorage
+ * and display them in the side bar
+ */
 function addToFavouritesCbk(xhr) {
 	var response = JSON.parse(xhr.responseText);
 
@@ -318,22 +367,31 @@ function addToFavouritesCbk(xhr) {
 		notify("The hero has been added to favourites");
 		heroId = response['addedFavouriteId'];
 		updateFavouritesStorage(heroId);
+		displayFavourites();
 	}
 	else
 		notify(response["response"]);
 }
 
+/*
+ * Call the server side api to get details of character by id
+ */
 function displayFavourites(){
 	favouritesId = localStorage.getItem("favouritesId").split(",");
 
 	if (favouritesId == null)
 		return;
+
 	favouritesContainer.innerHTML = '';
 	favouritesId.forEach(favouriteId => {
-		request("GET", baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId, displayFavouriteCbk)
+		url = baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId;
+		request("GET", , displayFavouriteCbk);
 	});
 }
 
+/*
+ * Display the favourites in the side bar
+ */
 function displayFavouriteCbk(xhr){
 	if (xhr.status == 200) {
 		var hero = JSON.parse(xhr.responseText);
@@ -344,7 +402,9 @@ function displayFavouriteCbk(xhr){
 		notify("An error occured.");
 }
 
-
+/*
+ * Call the server side api to remove the hero from the user's favourites
+ */
 function removeFromFavourites(heroId) {
 	if (!isAuthent())
 		return;
@@ -358,6 +418,10 @@ function removeFromFavourites(heroId) {
 	}
 }
 
+/*
+ * Update the favourites stored in localStorage
+ * and display them in the side bar
+ */
 function removeFromFavouritesCbk(xhr){
 	var response = JSON.parse(xhr.responseText);
 
@@ -365,12 +429,15 @@ function removeFromFavouritesCbk(xhr){
 		notify("The hero has been removed from favourites");
 		heroId = response['removedFavouriteId'];
 		updateFavouritesStorage(heroId, false);
+		displayFavourites();
 	}
 	else
 		notify(response["response"]);
 }
 
-
+/*
+ * Update the favourites stored in localStorage
+ */
 function updateFavouritesStorage(heroId, add = true) {
 	favouritesId = localStorage.getItem("favouritesId").split(",");
 
@@ -382,7 +449,6 @@ function updateFavouritesStorage(heroId, add = true) {
 		  favouritesId.splice(index, 1);
 	}
 	localStorage.setItem("favouritesId", favouritesId);
-	displayFavourites();
 }
 
 //******************* FAVOURITES
