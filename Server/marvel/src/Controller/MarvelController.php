@@ -139,8 +139,6 @@ class MarvelController extends AbstractController
 		}
 	}
 
-	
-
 	/*
 	 * return the hash of ts/privateKey/publicKey
 	 */

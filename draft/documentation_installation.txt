@@ -28,6 +28,21 @@ La base de données est vide, vous pouvez créer vos propres user et vous connec
 -Placer le fichier FO dans le server web apache local, puis lancer le fichier index.html via le navigateur
 
 
-***********
+*********** tests
+initalisation de la bdd
 
-lancement des tests unitaires
+-Suppression de la base de donnée
+	php bin/console doctrine:database:drop --force
+
+-Creation de la base de donnée
+	php bin/console doctrine:database:create
+
+-Creation du schéma de la base de données
+	php bin/console doctrine:schema:create
+
+-Chargement des fixtures
+	php bin/console doctrine:fixtures:load
+=> répondre yes
+
+lancement des tests
+./bin/phpunit

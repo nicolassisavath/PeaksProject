@@ -29,6 +29,11 @@ class UserController extends AbstractController
      */
     private $heroRepository;
 
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
     public function __construct(UserRepository $repository, HeroRepository $heroRepository)
     {
         $this->userRepository = $repository;
@@ -45,8 +50,11 @@ class UserController extends AbstractController
             $request->getContent(),
             true
         ); 
+        
+        $login = $post['login'];
+        $pwd = $post['password'];
 
-        if( is_null($login = $post['login']) || is_null($pwd = $post['password']) )
+        if( empty($login) || empty($pwd) )
             return new JsonResponse(["status" => "Some data are missing."], 400);
         else
         {
@@ -82,8 +90,11 @@ class UserController extends AbstractController
             true
         );    
 
-        if ( is_null($login = $post['login']) || is_null($pwd = $post['password']))
-            return new JsonResponse(["status" => "Some data are missing."], 400);
+        $login = $post['login'];
+        $pwd = $post['password'];
+
+        if( empty($login) || empty($pwd) )
+            return new JsonResponse(["status" => "Some data are missing.", "login" => $login, "password" => $pwd], 400);
         else
         {
             $dbUser = $this->userRepository->findOneBy(["login" => $login]);
@@ -117,7 +128,10 @@ class UserController extends AbstractController
             true
         );  
 
-        if ( is_null($userId = $post['userId']) || is_null($heroId = $post['heroId']) )
+        $userId = $post['userId'];
+        $heroId = $post['heroId'];
+
+        if( empty($userId) || empty($heroId) )
                 return new JsonResponse(["response" => "Bad request."], 400);
         else
         {
@@ -160,7 +174,10 @@ class UserController extends AbstractController
             true
         );  
 
-        if ( is_null($userId = $post['userId']) || is_null($heroId = $post['heroId']) )
+        $userId = $post['userId'];
+        $heroId = $post['heroId'];
+
+        if( empty($userId) || empty($heroId) )
                 return new JsonResponse(["response" => "Bad request."], 400);
         else
         {
