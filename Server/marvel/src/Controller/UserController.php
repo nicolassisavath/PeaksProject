@@ -91,6 +91,7 @@ class UserController extends AbstractController
 
             if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
             {
+                $fav = [];
                 if (count($dbUser->getHeroes()) > 0)
                 {
                     foreach ($dbUser->getHeroes() as $favorite) {

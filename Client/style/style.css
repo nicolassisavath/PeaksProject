@@ -68,7 +68,7 @@ main{
 	border: 1px solid pink;
 }
 .paginationBtn{
-	padding: 0 5px;
+	padding: 0 15px;
 }
 .paginationBtn:hover{
 	cursor: pointer;
@@ -89,9 +89,6 @@ main{
 	text-align: center;
 }
 
-
-
-
 /************ Hero Card ***********/
 .card:hover{
 	box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.8);
@@ -104,7 +101,6 @@ main{
 	box-shadow: 10px 10px 10px 10px rgba(0, 0, 0, 0.5);
 }
 .cardName{
-	/*border:1px solid black;*/
 	border-radius: 10px 10px 0 0;
 	height: 50px;
 	line-height: 50px;
@@ -112,13 +108,11 @@ main{
 	overflow: hidden;
 }
 .cardPicture{
-	/*border:1px solid blue;*/
 	height: 175px;
 	width: 150px;
 	cursor: pointer;
 }
 .cardDescription{
-	/*border:1px solid green;*/
 	border-radius: 0 0 10px 10px;
 	height: 65px;
 	overflow: hidden;
@@ -127,18 +121,17 @@ main{
 
 /******** HeroDetails Modal  *******/
 #heroDetailsModal{
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
+  position: fixed; 
+  z-index: 1; 
+  padding-top: 100px; /
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.4); 
 }
 
-/* Modal Content */
 .modal-content {
   background-color: white;
   margin: auto;
@@ -165,21 +158,19 @@ footer{
 	min-height: 100px;
 }
 
-
-
 /************ LOADER ***********/
 .loaderModal{
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 40vh; /* Location of the box */
+  position: fixed; 
+  z-index: 1; 
+  padding-top: 40vh; 
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.4);
 }
+
 .loader {
   border: 16px solid #f3f3f3;
   border-radius: 50%;
@@ -192,7 +183,6 @@ footer{
   position: relative;
 }
 
-
 /* Safari */
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
@@ -204,6 +194,3 @@ footer{
   100% { transform: rotate(360deg); }
 }
 
-.hidden{
-  display: none;
-}

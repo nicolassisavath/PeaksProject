@@ -108,22 +108,24 @@ function createCardFooter(hero, isFavouriteCard){
 	let cardFooter = document.createElement('div');
 	cardFooter.classList.add('cardDescription');
 
-	if (isFavouriteCard){// We create and put the button "Remove from favourites"
-	// To test
-	let removeFromFavouritesBtn = createRemoveBtn(hero);
-	cardFooter.appendChild(removeFromFavouritesBtn);
+	let description = createDescription(hero)
+	cardFooter.appendChild(description);
 
-		// let removeFromFavouritesBtn = document.createElement('button');
-		// removeFromFavouritesBtn.classList.add('btn');
-		// // Add event onclick on button => call server api to remove the hero from user favourites
-		// removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")")
-		// removeFromFavouritesBtn.innerHTML = "Remove from favourites"
-		// cardFooter.append(removeFromFavouritesBtn);
+	if (isFavouriteCard){// We create and show the button "Remove from favourites"
+		let removeFromFavouritesBtn = createRemoveBtn(hero);
+		cardFooter.appendChild(removeFromFavouritesBtn);
+		display(description, false);
 	}
-	else //  We put the description
-		cardFooter.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
 
 	return cardFooter;
+}
+
+function createDescription(hero){
+	let description = document.createElement('p');
+	description.classList.add("description");
+	description.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
+
+	return description
 }
 
 /*
@@ -187,7 +189,7 @@ function transferDetailsToModal(card, id){
 	//Name
 	modal.querySelector("#modalName").innerText = card.querySelector(".cardName").innerText;
 	//Description ?? cas du favoris...
-	modal.querySelector("#modalDescription").innerText = card.querySelector(".cardDescription").innerText;
+	modal.querySelector("#modalDescription").innerText = card.querySelector(".cardDescription>p.description").innerText;
 	//Image
 	var image = card.querySelector(".cardPicture").src;
 	modal.querySelector("#modalImage").src = image.replace(cardPictureFormat, modalPictureFormat);
@@ -225,8 +227,6 @@ function displayModalCbk(xhr){
 
 		if (showFavBtn)
 			addFavBtn.setAttribute("onclick", "addToFavourites(" + heroId + ")");
-		//???????? Gerer le removeFavBtn??? => ajouter sur html
-		// Ou gerer le createFavouriteBtn comme createRemoveBtn
 		
 		display(modal);
 	}
@@ -263,7 +263,7 @@ function paginate(offset, limit, total){
 	else {
 		var pagination = document.createElement('select');
 		// Add event onchange => display heroes with the selected offset
-		pagination.setAttribute("onclick", "displayHeroes(this.value)");
+		pagination.setAttribute("onchange", "displayHeroes(this.value)");
 		for(var i = 1; i <= max; i++){
 			var option = document.createElement('option');
 			option.value = (i-1) * limit; // put the corresponding offset as value
@@ -336,7 +336,9 @@ function addToFavouritesCbk(xhr) {
 		notify("The hero has been added to favourites");
 		heroId = response['addedFavouriteId'];
 		updateFavouritesStorage(heroId);
+		console.log('update favourites');
 		displayFavourites();
+		console.log('displayFavourites');
 	}
 	else
 		notify(response["response"]);
@@ -347,7 +349,7 @@ function addToFavouritesCbk(xhr) {
  */
 function displayFavourites(){
 	//Exit if no favorites stored
-	if (localStorage.getItem("favouritesId") == null)
+	if (localStorage.getItem("favouritesId") == null || localStorage.getItem("favouritesId") == '')
 		return ;
 	
 	favouritesId = localStorage.getItem("favouritesId").split(",");
@@ -355,7 +357,7 @@ function displayFavourites(){
 	favouritesContainer.innerHTML = '';
 	favouritesId.forEach(favouriteId => {
 		url = baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId;
-		request("GET", url, displayFavouriteCbk);
+		request("GET", url, displayFavouriteCbk, null, false);
 	});
 }
 

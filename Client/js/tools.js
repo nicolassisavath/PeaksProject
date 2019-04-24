@@ -8,23 +8,36 @@ var prefixHeroes = "marvel/";
 var prefixUser = "user/";
 var loader = document.querySelector(".loaderModal");
 	
-function request(method, url, callback = null, data = null) {
+
+//Make ajax requests to the server
+function request(method, url, callback, data = null, displayLoader = true) {
 	var xhr = new XMLHttpRequest();
 
-	xhr.onload = function(){
-		if (callback != null){
-			display(loader, false);
-			callback(this);
-		}
-
+	if (xhr == null){
+		notify("Your browser does not support ajax requests. <br />Please update your browser version.");
+		return;
 	}
 
-	display(loader);
-	xhr.open(method, url);
+	xhr.onload = function(){
+		display(loader, false);
+		callback(this);
+	}
+
+	xhr.ontimeout = function(){
+		notify("The server did not respond in suffiscient time.");
+		display(loader, false);
+	}
+
+	xhr.open(method, url, true);
+
+	xhr.timeout = 30000;// set a timeout of 30 s
+	if (displayLoader)
+		display(loader);
 	if (data){
 		data = JSON.stringify(data);
 		xhr.setRequestHeader("Content-Type", "application/json");
 	}
+	
 	xhr.send(data);
 }
 

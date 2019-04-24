@@ -108,7 +108,7 @@ function signInBtnCbk(xhr) {
 function signUpBtnCbk(xhr) {
 	var response = JSON.parse(xhr.responseText);
 	if (xhr.status == 200) {
-		notify("YCreation succeeded.You can connect now to rou account.");
+		notify("Creation succeeded! <br />You can connect now to your account.");
 	}
 	else
 		notify(response['status']);
