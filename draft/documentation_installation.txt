@@ -4,13 +4,15 @@
 	Git clone *******(mettre en public surement)
 	**********Ou envoyer le fichier zip
 
--Aller dans test2/api/marvel
-	Cd "chemin"
+-Aller dans PeaksProject/Server/marvel
+$ cd PeaksProject/Server/marvel/
+
 -Lancer la comande
-	Composer install
+$ composer install
+
 -Dans le fichier .env modifier le nom de l'hote et le mot de passe du owner de mysql
 -Creation de la base de donnée
-	php bin/console doctrine:database:create
+$	php bin/console doctrine:database:create
 
 -Creation du schéma de la base de données
 	php bin/console doctrine:schema:create
@@ -27,3 +29,5 @@ La base de données est vide, vous pouvez créer vos propres user et vous connec
 
 
 ***********
+
+lancement des tests unitaires

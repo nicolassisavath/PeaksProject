@@ -58,47 +58,16 @@ function createHeroCard(hero, isFavorite = false)
 	card.classList.add('card');
 
 	// Name
-	// To test
 	let cardName = createCardName(hero);
 	card.appendChild(cardName);
-	
-	// let cardName = document.createElement('div');
-	// card.appendChild(cardName);
-	// cardName.innerHTML = hero['name'];
-	// cardName.classList.add('cardName');
 
 	// Picture
-	// To test
 	let cardPicture = createCardPicture(hero);
 	card.appendChild(cardPicture);
-	// let cardPicture = document.createElement('img');
-	// card.appendChild(cardPicture);
-	// urlPicture = hero['path'] + "/" + cardPictureFormat + "." + hero['extension']
-	// cardPicture.src = urlPicture;
-	// cardPicture.setAttribute("onclick", "getModalDetails(this, " + hero['id'] + ")");
-	// cardPicture.classList.add('cardPicture');
 
 	// Card Footer
-	//To test
 	let cardFooter = createCardFooter(hero, isFavorite);
 	card.appendChild(cardFooter);
-
-	// let cardFooter = document.createElement('div');
-	// card.appendChild(cardFooter);
-
-	// if (isFavorite){
-	// 	// Remove from favourite Btn
-	// 	let removeFromFavouritesBtn = document.createElement('button');
-	// 	removeFromFavouritesBtn.setAttribute("onclick", "removeFromFavourites(" + hero['id'] + ")")
-	// 	removeFromFavouritesBtn.innerHTML = "Remove from favourites"
-	// 	removeFromFavouritesBtn.classList.add('btn');
-	// 	cardFooter.append(removeFromFavouritesBtn);
-	// }
-	// else {
-	// 	// Description
-	// 	cardFooter.innerHTML = (hero['description'] == '' ? "No Description" : hero['description']);
-	// 	cardFooter.classList.add('cardDescription');
-	// }
 
 	return card;
 }
@@ -377,6 +346,7 @@ function addToFavouritesCbk(xhr) {
  * Call the server side api to get details of character by id
  */
 function displayFavourites(){
+	//Exit if no favorites stored
 	if (localStorage.getItem("favouritesId") == null)
 		return ;
 	

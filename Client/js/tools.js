@@ -6,15 +6,20 @@ Functions and variables utilized in other script files
 var baseUrl = "http://localhost:8000/api/";
 var prefixHeroes = "marvel/";
 var prefixUser = "user/";
+var loader = document.querySelector(".loaderModal");
 	
 function request(method, url, callback = null, data = null) {
 	var xhr = new XMLHttpRequest();
 
 	xhr.onload = function(){
-		if (callback != null)
+		if (callback != null){
+			display(loader, false);
 			callback(this);
+		}
+
 	}
 
+	display(loader);
 	xhr.open(method, url);
 	if (data){
 		data = JSON.stringify(data);
