@@ -80,6 +80,8 @@ signUpBtn.onclick = function(e){
 	}
 }
 
+//********* CALLBACKS
+
 /*
  * Handle the connection:
  *		- notify the connected user

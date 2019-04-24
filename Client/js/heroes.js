@@ -5,8 +5,6 @@ var modalPictureFormat = "portrait_uncanny";// Format of the details modal pictu
 var sizePage = 20;// Number of hero cards par page
 var initialOffset = 100;// Default offset of pagination
 
-//******************* TOOLS
-
 /*
  * Call Server API that returns list of heroes according to offset and limit
  * Called at the onload of the page and on pagination button onclick.
