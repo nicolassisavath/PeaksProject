@@ -47,5 +47,7 @@ La base de données est vide, vous pouvez créer vos propres users et vous conne
 => répondre yes
 
 ****lancement des tests:
+php bin/phpunit
+ou 
 ./bin/phpunit
 
