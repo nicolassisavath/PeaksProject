@@ -336,9 +336,7 @@ function addToFavouritesCbk(xhr) {
 		notify("The hero has been added to favourites");
 		heroId = response['addedFavouriteId'];
 		updateFavouritesStorage(heroId);
-		console.log('update favourites');
 		displayFavourites();
-		console.log('displayFavourites');
 	}
 	else
 		notify(response["response"]);
@@ -356,8 +354,10 @@ function displayFavourites(){
 
 	favouritesContainer.innerHTML = '';
 	favouritesId.forEach(favouriteId => {
-		url = baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId;
-		request("GET", url, displayFavouriteCbk, null, false);
+		if (favouriteId != '') {
+			url = baseUrl + prefixHeroes + "getCharacterById?id=" + favouriteId;
+			request("GET", url, displayFavouriteCbk, null, false);
+		}
 	});
 }
 

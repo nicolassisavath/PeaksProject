@@ -19,13 +19,15 @@ function request(method, url, callback, data = null, displayLoader = true) {
 	}
 
 	xhr.onload = function(){
-		display(loader, false);
 		callback(this);
+		if (displayLoader)
+			display(loader, false);
 	}
 
 	xhr.ontimeout = function(){
 		notify("The server did not respond in suffiscient time.");
-		display(loader, false);
+		if (displayLoader)
+			display(loader, false);
 	}
 
 	xhr.open(method, url, true);
@@ -37,7 +39,7 @@ function request(method, url, callback, data = null, displayLoader = true) {
 		data = JSON.stringify(data);
 		xhr.setRequestHeader("Content-Type", "application/json");
 	}
-	
+
 	xhr.send(data);
 }
 

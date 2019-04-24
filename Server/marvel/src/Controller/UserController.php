@@ -29,11 +29,6 @@ class UserController extends AbstractController
      */
     private $heroRepository;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
     public function __construct(UserRepository $repository, HeroRepository $heroRepository)
     {
         $this->userRepository = $repository;
@@ -51,25 +46,29 @@ class UserController extends AbstractController
             true
         ); 
 
-        if(($login = $post['login']) !== null && ($pwd = $post['password']) != null)
+        if( is_null($login = $post['login']) || is_null($pwd = $post['password']) )
+            return new JsonResponse(["status" => "Some data are missing."], 400);
+        else
         {
-            if ( ($dbUser = $this->userRepository->findOneBy(["login" => $login])) !== null )
+            //Control if a user already has the same login
+            if ( !is_null( $dbUser = $this->userRepository->findOneBy(["login" => $login]) ))
                 return new JsonResponse(["status" => "This login already exists."], 400);
             else
+            {
+                //init the new user
                 $user = new User();
                 $user->setLogin($login)
                      ->setPassword(password_hash($pwd, PASSWORD_DEFAULT))
                      ->setFavoritesNumber(0);
 
+                //persist the user in db
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($user);
                 $em->flush();
 
                 return new JsonResponse(["status" => "The account was ceated successfully"]);
-            //retourné le client aussi
+            }
         }
-        else
-            return new JsonResponse(["status" => "Bad credentials."]);
     }
 
     /**
@@ -83,7 +82,7 @@ class UserController extends AbstractController
             true
         );    
 
-        if ( ($login = $post['login']) === null|| ($pwd = $post['password']) == null)
+        if ( is_null($login = $post['login']) || is_null($pwd = $post['password']))
             return new JsonResponse(["status" => "Some data are missing."], 400);
         else
         {
@@ -91,10 +90,12 @@ class UserController extends AbstractController
 
             if($dbUser !== null && password_verify($pwd, $dbUser->getPassword()))
             {
+                //If the user exists, return his favourites characters id in an array
                 $fav = [];
                 if (count($dbUser->getHeroes()) > 0)
                 {
-                    foreach ($dbUser->getHeroes() as $favorite) {
+                    foreach ($dbUser->getHeroes() as $favorite) 
+                    {
                         $fav[] = $favorite->getMarvelId();
                     }
                 }
@@ -116,7 +117,7 @@ class UserController extends AbstractController
             true
         );  
 
-        if ( ($userId = $post['userId']) === null || ($heroId = $post['heroId']) === null )
+        if ( is_null($userId = $post['userId']) || is_null($heroId = $post['heroId']) )
                 return new JsonResponse(["response" => "Bad request."], 400);
         else
         {
@@ -125,18 +126,20 @@ class UserController extends AbstractController
                 return new JsonResponse(["response" => "User not found."], 400);
 
             if(count($user->getHeroes()) === 5)
-                return new JsonResponse(["response" => "Allready 5 favourites."], 400);
+                return new JsonResponse(["response" => "You achieved the max number of favourites."], 400);
 
             $dbHero = $this->heroRepository->findOneBy(["marvelId" => $heroId]);
+            $em = $this->getDoctrine()->getManager();
+
+            //if the hero is not in hero table yet, we save his id hero table
             if ( $dbHero === null )
             {
                 $dbHero = new Hero($heroId);
-
-                $em = $this->getDoctrine()->getManager();
                 $em->persist($dbHero);
                 $em->flush();
             }
 
+            //join the hero to the user and persist him
             $user->addHero($dbHero);
             $user->incrementFavoritesNumber();
             $em->persist($user);
@@ -157,7 +160,7 @@ class UserController extends AbstractController
             true
         );  
 
-        if ( ($userId = $post['userId']) === null || ($heroId = $post['heroId']) === null )
+        if ( is_null($userId = $post['userId']) || is_null($heroId = $post['heroId']) )
                 return new JsonResponse(["response" => "Bad request."], 400);
         else
         {
@@ -165,11 +168,14 @@ class UserController extends AbstractController
             if (is_null($user))
                 return new JsonResponse(["response" => "User not found."], 400);
 
+            //verify if the hero is in hero table
             $dbHero = $this->heroRepository->findOneBy(["marvelId" => $heroId]);
+            //Should not happen, except if db is corrupted
             if ( is_null($dbHero) )
                 return new JsonResponse(["response" => "Hero not found."], 400);
             else
             {
+                //Remove the join between hero and user and persit him
                 $user->removeHero($dbHero);
                 $user->decrementFavoritesNumber();
                 $em = $this->getDoctrine()->getManager();
@@ -180,157 +186,4 @@ class UserController extends AbstractController
             return new JsonResponse(["response" => "Favourite added",  "removedFavouriteId" => $dbHero->getMarvelId()]);
         }            
     }
-
-
-//     /**
-//      * API : Login
-//      * @Route("/compare", methods={"POST"})
-//      */
-//     public function gjfd(Request $request)
-//     {
-//         $response = new JsonResponse(["statut" => "données manquantes"]);
-//         $response->setPublic();
-//             // $response->headers->set('Content-Type', 'xml');
-//             // $response->headers->set('Access-Control-Allow-Headers', 'origin, content-type, accept');
-//     // $response->headers->set('Access-Control-Allow-Origin', '*');
-//     // $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS');
-// // $response->headers[] = ['Access-Control-Allow-Headers'=> 'origin, content-type, accept'];
-// // $response->headers[] = ['Access-Control-Allow-Origin', '*'];
-// // $response->headers[] = ['Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, PATCH, OPTIONS'];
-
-// // var_dump($response);
-//         return $response;
-//         // return new JsonResponse(["statut" => "données manquantes"]);
-//     }
-
-
-
-    //***************************************************
-    /**
-     * @Route("/", name="user_index", methods={"GET"})
-     */
-    public function index(UserRepository $userRepository): Response
-    {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
-    }
-
-
-    // /**
-    //  * @Route("/new", name="user_new", methods={"GET","POST"})
-    //  */
-    // public function new(Request $request): Response
-    // {
-    //     $user = new User();
-    //     $data = json_decode(
-    //         $request->getContent(),
-    //         true
-    //     );
-
-    //     var_dump($request->query);
-    //     var_dump($request->request);//do ot work with json data
-
-    //     $info = $request->getContent();
-
-    //     var_dump($info);
-    //     var_dump($data);
-    //     var_dump($data["login"]);
-
-    //     var_dump($request);
-
-    //     // $user->setLogin($request->request->get('login'));
-    //     // // $clearPwd = $request->get('password');
-    //     // // $user->setPassword(password_hash($clearPwd, PASSWORD_DEFAULT));
-    //     // // $user->setFavoritesNumber(0);
-    //     // $form = $this->createForm(UserType::class, $user);
-    //     // $form->handleRequest($request);
-
-    //     // // if ($form->isSubmitted() && $form->isValid()) {
-    //     // //     $entityManager = $this->getDoctrine()->getManager();
-    //     //     $entityManager->persist($user);
-    //     //     $entityManager->flush();
-
-    //     // //     return $this->redirectToRoute('user_index');
-    //     // // }
-
-    //     // return $this->render('user/new.html.twig', [
-    //     //     'user' => $user,
-    //     //     'request' => $request,
-    //     //     'form' => $form->createView(),
-    //     // ]);
-    //     return new Response([["ok" => "yep"]]);
-        
-    // }
-
-    // /**
-    //  * @Route("/{id}", name="user_show", methods={"GET"})
-    //  */
-    // public function show(User $user): Response
-    // {
-    //     return $this->render('user/show.html.twig', [
-    //         'user' => $user,
-    //     ]);
-    // }
-
-    // /**
-    //  * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
-    //  */
-    // public function edit(Request $request, User $user): Response
-    // {
-    //     $form = $this->createForm(UserType::class, $user);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $this->getDoctrine()->getManager()->flush();
-
-    //         return $this->redirectToRoute('user_index', [
-    //             'id' => $user->getId(),
-    //         ]);
-    //     }
-
-    //     return $this->render('user/edit.html.twig', [
-    //         'user' => $user,
-    //         'form' => $form->createView(),
-    //     ]);
-    // }
-
-    // /**
-    //  * @Route("/{id}", name="user_delete", methods={"DELETE"})
-    //  */
-    // public function delete(Request $request, User $user): Response
-    // {
-    //     if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
-    //         $entityManager = $this->getDoctrine()->getManager();
-    //         $entityManager->remove($user);
-    //         $entityManager->flush();
-    //     }
-
-    //     return $this->redirectToRoute('user_index');
-    // }
-
-    /***************
-
-    //     /**
-    //  * @Route("/new", name="create_user", methods={"POST"})
-    //  */
-    // public function CreateNew(Request $request): Response
-    // {
-    //     $user = new User();
-    //     $form = $this->createForm(UserType::class, $user);
-    //     $form->handleRequest($request);
-
-    //     if ($form->isSubmitted() && $form->isValid()) {
-    //         $entityManager = $this->getDoctrine()->getManager();
-    //         $entityManager->persist($user);
-    //         $entityManager->flush();
-
-    //         return $this->redirectToRoute('user_index');
-    //     }
-
-    //     return $this->render('user/new.html.twig', [
-    //         'user' => $user,
-    //         'form' => $form->createView(),
-    //     ]);
-    // }
 }

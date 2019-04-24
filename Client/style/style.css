@@ -18,22 +18,24 @@
 }
 /************ HEADER ***********/
 header{
-	border: 1px solid red;
+	border: 1px solid black;
 	display: flex;
 	justify-content: space-around;
 }
 
 #logo{
 	display: block;
-	border: 1px solid black;
 	width: 250px;
 	height: 100px;
 	background:url(https://i.annihil.us/u/prod/misc/marvel.svg);
 }
 
 #userForms{
-	border: 1px solid blue;
 	display: flex;
+}
+
+#userForms form{
+	padding: 0 10px;
 }
 
 #logout{
@@ -51,12 +53,10 @@ main{
 }
 
 #main{
-	border: 1px solid black;
 	width: 100%;
 }
 
 #paginationContainer{
-	border: 1px solid green;
 	text-align: center;
 	height: 50px;
 	line-height: 50px;
@@ -65,7 +65,6 @@ main{
 	display: flex;
 	justify-content: space-around;
 	flex-wrap: wrap;
-	border: 1px solid pink;
 }
 .paginationBtn{
 	padding: 0 15px;
@@ -75,8 +74,8 @@ main{
 }
 /************ Sidebar ***********/
 #sidebar{
-	border: 1px solid green;
-	min-width: 300px;
+	width: 225px;
+	border:1px solid green;
 }
 
 #notifications{
@@ -84,7 +83,6 @@ main{
 	color : red;
 }
 #favouritesContainer{
-	border:1px solid blue;
 	padding: auto;
 	text-align: center;
 }
@@ -155,7 +153,9 @@ main{
 /************ FOOTER ***********/
 footer{
 	border: 1px solid green;
-	min-height: 100px;
+	height: 100px;
+	line-height: 100px;
+	text-align: center;
 }
 
 /************ LOADER ***********/
