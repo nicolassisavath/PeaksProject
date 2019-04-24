@@ -7,7 +7,11 @@
 -Lancer la comande:
  composer install
 
--Dans le fichier .env modifier le nom de l'hote et le mot de passe du owner de mysql
+-Dans le fichier .env (ligne 27)modifier les données par défaut:
+le nom de l'hote (db_username)
+le mot de passe (db_userpwd)
+par vos propres données du owner de mysql.
+
 -Creation de la base de données:
 	php bin/console doctrine:database:create
 
